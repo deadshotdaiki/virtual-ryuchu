@@ -68,7 +68,6 @@
       cursor: pointer;
     }
 
-    /* 認証エリア */
     .auth-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -113,7 +112,6 @@
       display: none !important;
     }
 
-    /* メインコンテンツ */
     .nav-tabs {
       display: flex;
       gap: 8px;
@@ -163,9 +161,20 @@
     .post-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 0.75rem;
       color: var(--text-muted);
       margin-bottom: 8px;
+    }
+
+    .btn-delete {
+      background: transparent;
+      color: #ef4444;
+      border: none;
+      font-size: 0.7rem;
+      cursor: pointer;
+      width: auto;
+      padding: 0;
     }
 
     .comments-section {
@@ -219,22 +228,57 @@
       color: var(--text-muted);
     }
 
-    /* DM */
-    .box-bubble {
-      padding: 10px 12px;
-      border-radius: 10px;
-      margin-bottom: 8px;
+    /* LINE風 トークUI */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 420px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-bubble {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 14px;
       font-size: 0.85rem;
+      line-height: 1.4;
+      word-break: break-all;
     }
 
-    .box-bubble.guest {
-      background: rgba(4, 5, 8, 0.6);
+    .chat-bubble.mine {
+      align-self: flex-end;
+      background: var(--accent-color);
+      color: #000;
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-bubble.other {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.1);
       border: 1px solid var(--border-color);
+      border-bottom-left-radius: 2px;
     }
 
-    .box-bubble.admin {
-      background: rgba(192, 132, 252, 0.1);
-      border: 1px solid var(--accent-color);
+    .chat-time {
+      font-size: 0.6rem;
+      opacity: 0.7;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 6px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
     }
 
     /* モーダル */
@@ -249,9 +293,7 @@
       padding: 20px;
     }
 
-    .modal.show {
-      display: flex;
-    }
+    .modal.show { display: flex; }
 
     .modal-content {
       background: var(--bg-color);
@@ -287,14 +329,14 @@
   <div class="container">
     <header>
       <h1>O-asis</h1>
-      <div id="user-display-area" class="user-info">
+      <div id="user-display-area" class="user-info hidden">
         <span id="user-display"></span>
         <span id="admin-badge" style="color:var(--accent-color);"></span>
         <button class="btn-logout" onclick="logout()">LOGOUT</button>
       </div>
     </header>
 
-    <!-- 認証セッション -->
+    <!-- 認証画面 -->
     <div id="auth-section" class="auth-card">
       <h2 style="font-size:1.1rem; margin-bottom:14px; text-align:center;">LOGIN</h2>
       <input type="text" id="auth-name" placeholder="ユーザー名">
@@ -305,27 +347,14 @@
     <!-- メインコンテンツ -->
     <div id="main-section" class="hidden">
       <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('home', event)">HOME</button>
-        <button class="tab-btn" onclick="switchTab('timeline', event)">TIMELINE</button>
+        <button class="tab-btn active" onclick="switchTab('timeline', event)">TIMELINE</button>
         <button class="tab-btn" onclick="switchTab('gallery', event)">GALLERY</button>
-        <button class="tab-btn" onclick="switchTab('dm', event)">DM</button>
+        <button class="tab-btn" onclick="switchTab('talk', event)">TALK</button>
       </div>
 
-      <!-- HOME -->
-      <div id="tab-home" class="card active">
-        <h3 style="font-size:0.9rem; color:var(--accent-color); margin-bottom:10px;">STATUS</h3>
-        <p id="current-status-text" style="margin-bottom:14px; font-weight:300;"></p>
-        <input type="text" id="status-input" placeholder="ステータス更新 (ローカル保存)">
-        <button onclick="updateStatusText()" style="margin-bottom:20px;">更新</button>
-
-        <h3 style="font-size:0.9rem; color:var(--accent-color); margin-bottom:10px;">DISCORD</h3>
-        <button onclick="copyDiscord()">Discord ID をコピー</button>
-      </div>
-
-      <!-- TIMELINE -->
-      <div id="tab-timeline" class="card">
+      <!-- TIMELINE (初期表示) -->
+      <div id="tab-timeline" class="card active">
         <div style="margin-bottom:20px; background:rgba(4,5,8,0.5); padding:12px; border-radius:10px; border:1px solid var(--border-color);">
-          <input type="text" id="new-post-author" placeholder="投稿名">
           <textarea id="new-post-text" placeholder="いまどうしてる？" rows="3"></textarea>
           <input type="text" id="new-post-image" placeholder="画像URL (任意)">
           <button onclick="addNewPost()">投稿する</button>
@@ -338,40 +367,23 @@
         <div id="gallery-container"></div>
       </div>
 
-      <!-- DM -->
-      <div id="tab-dm" class="card">
-        <div id="dm-guest-section">
-          <div id="dm-login-box">
-            <h3 style="font-size:0.9rem; color:var(--accent-color); margin-bottom:10px;">暗号通信 (ゲスト送信)</h3>
-            <input type="text" id="dm-name" placeholder="お名前">
-            <input type="password" id="dm-birthday" placeholder="暗証番号 (誕生日など)">
-            <textarea id="dm-message" placeholder="メッセージを入力..." rows="3"></textarea>
-            <button onclick="sendAndOpenDm()">送信 / スレッドを開く</button>
-          </div>
-
-          <div id="dm-chat-box" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <span id="current-dm-info" style="font-size:0.75rem; color:var(--accent-color);"></span>
-              <button onclick="closeDmChat()" style="width:auto; padding:4px 10px; font-size:0.7rem;">戻る</button>
-            </div>
-            <div id="dm-messages" style="max-height:300px; overflow-y:auto; margin-bottom:10px; padding-right:4px;"></div>
-            <form onsubmit="sendDmReply(event)" style="display:flex; gap:6px;">
-              <input type="text" id="dm-reply-msg" placeholder="返信..." style="margin-bottom:0;">
-              <button type="submit" style="width:auto; padding:0 16px;">送信</button>
-            </form>
-          </div>
-
-          <hr style="border:none; border-top:1px solid var(--border-color); margin:20px 0;">
-          <input type="password" id="admin-passkey" placeholder="管理者用パスキー">
-          <button onclick="loginAsAdmin()" style="background:transparent; border:1px solid var(--border-color); color:var(--text-muted);">管理者ログイン</button>
+      <!-- TALK (LINE風 1対1トーク) -->
+      <div id="tab-talk" class="card">
+        <!-- 管理者用トーク選択メニュー -->
+        <div id="admin-talk-selector" style="display:none; margin-bottom:10px;">
+          <select id="user-chat-select" onchange="changeAdminChatTarget()" style="width:100%; padding:8px; background:rgba(4,5,8,0.8); color:var(--text-main); border:1px solid var(--border-color); border-radius:8px; outline:none; font-size:0.85rem;">
+            <option value="">トーク相手を選択...</option>
+          </select>
         </div>
 
-        <div id="admin-dashboard" style="display:none;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-            <h3 style="font-size:0.9rem; color:var(--accent-color);">DM ADMIN DASHBOARD</h3>
-            <button onclick="logoutAdmin()" style="width:auto; padding:4px 10px; font-size:0.7rem;">ログアウト</button>
+        <div class="chat-container">
+          <div id="chat-messages" class="chat-messages">
+            <div class="loading">メッセージを読み込んでいます...</div>
           </div>
-          <div id="admin-messages-list"></div>
+          <form class="chat-input-area" onsubmit="sendChatMessage(event)">
+            <input type="text" id="chat-reply-input" placeholder="メッセージを入力..." style="margin-bottom:0;">
+            <button type="submit" style="width:auto; padding:0 18px;">送信</button>
+          </form>
         </div>
       </div>
     </div>
@@ -388,13 +400,12 @@
   </div>
 
   <script>
-    // ログイン認証用GASとDM機能用GASのURL設定
     const AUTH_GAS_URL = "https://script.google.com/macros/s/AKfycbx-SJ2DJZuQw-vyr9-_hhV8JyGiA3-Ob7sj-9_fw-C1FHqu8HVa-ISuH7OusQURtNep4g/exec";
     const DM_GAS_URL = "https://script.google.com/macros/s/AKfycbyL7hDxmO3DJdg0XWCCtQBlZSMPT4SKNx3xlCDnOhJ60uSa2wExSzOkRSyrYMBrPvMAxw/exec";
 
-    let currentBirthday = "";
-    let currentName = "";
+    let currentUser = null;
     let audioCtx = null;
+    let activeAdminChatUser = "";
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -403,36 +414,26 @@
       }[m]));
     }
 
-    // 認証セッション管理
+    // --- 認証 & ログイン状態維持 ---
     function handleLogin() {
       const nameInput = document.getElementById('auth-name');
       const passInput = document.getElementById('auth-pass');
-
-      if (!nameInput || !passInput) return;
-
       const name = nameInput.value.trim();
       const pass = passInput.value.trim();
 
       if (!name || !pass) {
-        alert('名前とパスワードを入力してください。');
+        alert('ユーザー名とパスワードを入力してください。');
         return;
       }
 
       fetch(AUTH_GAS_URL, {
         method: 'POST',
-        body: JSON.stringify({
-          action: 'login',
-          name: name,
-          pass: pass
-        })
+        body: JSON.stringify({ action: 'login', name: name, pass: pass })
       })
       .then(res => res.json())
       .then(resData => {
         if (resData.status === 'success') {
-          const currentUser = {
-            name: name,
-            isAdmin: resData.isAdmin
-          };
+          currentUser = { name: name, isAdmin: resData.isAdmin };
           localStorage.setItem('o_asis_session', JSON.stringify(currentUser));
           initSession();
         } else {
@@ -455,24 +456,17 @@
 
       if (sessionData) {
         try {
-          const user = JSON.parse(sessionData);
-          userDisplay.textContent = escapeHtml(user.name);
-          adminBadge.textContent = user.isAdmin ? '[ADMIN]' : '[USER]';
+          currentUser = JSON.parse(sessionData);
+          userDisplay.textContent = escapeHtml(currentUser.name);
+          adminBadge.textContent = currentUser.isAdmin ? '[ADMIN]' : '[USER]';
           userDisplayArea.classList.remove('hidden');
-          
-          // ログイン名を投稿名欄とDMお名前欄に自動反映
-          const postAuthorInput = document.getElementById('new-post-author');
-          if (postAuthorInput) postAuthorInput.value = user.name;
-          
-          const dmNameInput = document.getElementById('dm-name');
-          if (dmNameInput) dmNameInput.value = user.name;
 
           authSection.style.display = 'none';
           mainSection.classList.remove('hidden');
-          
-          loadStatus();
+
           loadTimeline();
           loadGallery();
+          initTalkTab();
         } catch(e) {
           logout();
         }
@@ -485,24 +479,17 @@
 
     function logout() {
       localStorage.removeItem('o_asis_session');
+      currentUser = null;
       document.getElementById('auth-name').value = '';
       document.getElementById('auth-pass').value = '';
-      
-      // 入力欄に反映されていたログイン名もクリア
-      const postAuthorInput = document.getElementById('new-post-author');
-      if (postAuthorInput) postAuthorInput.value = '';
-      const dmNameInput = document.getElementById('dm-name');
-      if (dmNameInput) dmNameInput.value = '';
-
       initSession();
     }
 
-    // 効果音処理
+    // --- 効果音 ---
     function playSound(type) {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
@@ -510,65 +497,35 @@
         const now = audioCtx.currentTime;
 
         if (type === 'tab') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(587.33, now);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(587.33, now);
           osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
           gain.gain.setValueAtTime(0.025, now);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
           osc.start(now); osc.stop(now + 0.08);
-        } else if (type === 'modal') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(440, now);
-          osc.frequency.exponentialRampToValueAtTime(1320, now + 0.15);
-          gain.gain.setValueAtTime(0.03, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
-          osc.start(now); osc.stop(now + 0.15);
         } else if (type === 'action') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(659.25, now);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(659.25, now);
           osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.1);
           gain.gain.setValueAtTime(0.03, now);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
           osc.start(now); osc.stop(now + 0.1);
-        } else {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(800, now);
-          osc.frequency.exponentialRampToValueAtTime(400, now + 0.04);
-          gain.gain.setValueAtTime(0.02, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
-          osc.start(now); osc.stop(now + 0.04);
         }
       } catch (e) {}
     }
 
-    // タブ切り替え
+    // --- タブ切り替え ---
     function switchTab(tabName, event) {
       playSound('tab');
       document.querySelectorAll('#main-section .tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('#main-section .card').forEach(c => c.classList.remove('active'));
       event.currentTarget.classList.add('active');
       document.getElementById('tab-' + tabName).classList.add('active');
+
+      if (tabName === 'talk') {
+        fetchTalkMessages();
+      }
     }
 
-    function copyDiscord() {
-      navigator.clipboard.writeText('vamos_cantar').then(() => alert('Discord ID をコピーしました。'));
-    }
-
-    function loadStatus() {
-      const savedStatus = localStorage.getItem('o_asis_status') || '(通常営業中)';
-      document.getElementById('current-status-text').innerText = savedStatus;
-    }
-
-    function updateStatusText() {
-      const val = document.getElementById('status-input').value.trim();
-      if (!val) return;
-      localStorage.setItem('o_asis_status', val);
-      document.getElementById('status-input').value = '';
-      loadStatus();
-      alert('ステータスを更新しました。');
-    }
-
-    // タイムライン処理
+    // --- タイムライン機能 & 削除機能 ---
     function loadTimeline() {
       fetch('posts.json')
         .then(res => res.json())
@@ -584,11 +541,10 @@
     }
 
     function addNewPost() {
-      const authorInput = document.getElementById('new-post-author');
       const textInput = document.getElementById('new-post-text');
       const imageInput = document.getElementById('new-post-image');
-
       const text = textInput.value.trim();
+
       if (!text) {
         alert('本文を入力してください。');
         return;
@@ -599,7 +555,7 @@
 
       const newPost = {
         id: 'post-' + Date.now(),
-        author: authorInput.value.trim() || 'O-ji',
+        author: currentUser ? currentUser.name : 'ゲスト',
         date: dateStr,
         text: text,
         image: imageInput.value.trim(),
@@ -625,6 +581,24 @@
         });
     }
 
+    function deletePost(postIndex) {
+      if (!confirm('この投稿を削除しますか？')) return;
+      let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+      localPosts.splice(postIndex, 1);
+      localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
+      renderTimeline(localPosts);
+    }
+
+    function deleteComment(postIndex, commentIndex) {
+      if (!confirm('この返信を削除しますか？')) return;
+      let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+      if (localPosts[postIndex] && localPosts[postIndex].comments) {
+        localPosts[postIndex].comments.splice(commentIndex, 1);
+        localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
+        renderTimeline(localPosts);
+      }
+    }
+
     function renderTimeline(posts) {
       const container = document.getElementById('timeline-container');
       if (!posts || posts.length === 0) {
@@ -632,24 +606,34 @@
         return;
       }
       container.innerHTML = '';
-      posts.forEach((post, index) => {
+      posts.forEach((post, pIdx) => {
         const card = document.createElement('div');
         card.className = 'post-card';
         
         let imageHtml = (post.image && post.image.trim() !== "") 
-          ? `<img src="${post.image}" class="gallery-image" style="border-radius:12px; margin-top:12px; cursor:pointer;" onclick="playSound('modal'); openModalWithImage('${post.image}', '${escapeHtml(post.date)}', '${escapeHtml(post.text)}')">` 
+          ? `<img src="${post.image}" class="gallery-image" style="border-radius:12px; margin-top:12px; cursor:pointer;" onclick="openModalWithImage('${post.image}', '${escapeHtml(post.date)}', '${escapeHtml(post.text)}')">` 
           : '';
         
-        let authorHtml = post.author ? `<span style="color:#c084fc; margin-right:8px;">${escapeHtml(post.author)}</span>` : '';
+        let authorHtml = post.author ? `<span style="color:var(--accent-color); margin-right:8px; font-weight:bold;">${escapeHtml(post.author)}</span>` : '';
+
+        // 投稿の削除ボタン判定（自分または管理者）
+        const canDeletePost = currentUser && (currentUser.isAdmin || currentUser.name === post.author);
+        const deletePostBtn = canDeletePost ? `<button class="btn-delete" onclick="deletePost(${pIdx})">削除</button>` : '';
 
         let commentsHtml = '';
         if (post.comments && post.comments.length > 0) {
-          post.comments.forEach(comm => {
+          post.comments.forEach((comm, cIdx) => {
+            const canDeleteComm = currentUser && (currentUser.isAdmin || currentUser.name === comm.author);
+            const deleteCommBtn = canDeleteComm ? `<button class="btn-delete" onclick="deleteComment(${pIdx}, ${cIdx})">削除</button>` : '';
+
             commentsHtml += `
               <div class="comment-item">
                 <div class="comment-header">
-                  <span><b style="color:#c084fc;">${escapeHtml(comm.author)}</b></span>
-                  <span>${escapeHtml(comm.date)}</span>
+                  <span><b style="color:var(--accent-color);">${escapeHtml(comm.author)}</b></span>
+                  <div>
+                    <span style="margin-right:6px;">${escapeHtml(comm.date)}</span>
+                    ${deleteCommBtn}
+                  </div>
                 </div>
                 <div style="word-break:break-all; font-weight:300; line-height:1.4;">${escapeHtml(comm.text)}</div>
               </div>
@@ -658,20 +642,20 @@
         }
 
         card.innerHTML = `
-          <div class="post-header"><span>${authorHtml}${escapeHtml(post.date || '')}</span></div>
+          <div class="post-header">
+            <span>${authorHtml}${escapeHtml(post.date || '')}</span>
+            ${deletePostBtn}
+          </div>
           <div style="font-size:0.85rem; font-weight:300; line-height:1.6; word-break:break-all;">${escapeHtml(post.text || '')}</div>
           ${imageHtml}
           
           <div class="comments-section">
             <div style="font-size:0.6rem; color:var(--text-muted); margin-bottom:8px; letter-spacing:1px;">REPLIES</div>
-            <div id="comments-list-${index}">${commentsHtml}</div>
+            <div id="comments-list-${pIdx}">${commentsHtml}</div>
             
-            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
-              <input type="text" id="comment-author-${index}" placeholder="お名前（任意）" style="margin-bottom:0; font-size:0.7rem; padding:8px 12px;">
-              <div style="display: flex; gap: 6px;">
-                <input type="text" id="comment-text-${index}" placeholder="返信を入力..." style="margin-bottom:0; font-size:0.7rem; padding:8px 12px;" onkeypress="if(event.key === 'Enter') addComment(${index})">
-                <button onclick="playSound('action'); addComment(${index})" style="width: auto; padding: 8px 14px; font-size:0.6rem;">REPLY</button>
-              </div>
+            <div style="margin-top: 10px; display: flex; gap: 6px;">
+              <input type="text" id="comment-text-${pIdx}" placeholder="返信を入力..." style="margin-bottom:0; font-size:0.75rem; padding:8px 12px;" onkeypress="if(event.key === 'Enter') addComment(${pIdx})">
+              <button onclick="playSound('action'); addComment(${pIdx})" style="width: auto; padding: 8px 14px; font-size:0.65rem;">REPLY</button>
             </div>
           </div>
         `;
@@ -679,14 +663,12 @@
       });
     }
 
-    function addComment(index) {
-      const authorInput = document.getElementById(`comment-author-${index}`);
-      const textInput = document.getElementById(`comment-text-${index}`);
-      
-      const author = authorInput.value.trim() || 'ゲスト';
+    function addComment(pIdx) {
+      const textInput = document.getElementById(`comment-text-${pIdx}`);
       const text = textInput.value.trim();
       if (!text) return;
 
+      const author = currentUser ? currentUser.name : 'ゲスト';
       const now = new Date();
       const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
@@ -695,23 +677,23 @@
         .then(jsonPosts => {
           let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
           if (localPosts.length === 0) localPosts = jsonPosts;
-          if (!localPosts[index].comments) localPosts[index].comments = [];
-          localPosts[index].comments.push({ author: author, date: dateStr, text: text });
+          if (!localPosts[pIdx].comments) localPosts[pIdx].comments = [];
+          localPosts[pIdx].comments.push({ author: author, date: dateStr, text: text });
           localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
           renderTimeline(localPosts);
         })
         .catch(() => {
           let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-          if (localPosts[index]) {
-            if (!localPosts[index].comments) localPosts[index].comments = [];
-            localPosts[index].comments.push({ author: author, date: dateStr, text: text });
+          if (localPosts[pIdx]) {
+            if (!localPosts[pIdx].comments) localPosts[pIdx].comments = [];
+            localPosts[pIdx].comments.push({ author: author, date: dateStr, text: text });
             localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
             renderTimeline(localPosts);
           }
         });
     }
 
-    // ギャラリー & モーダル
+    // --- ギャラリー ---
     function loadGallery() {
       fetch('gallery.json').then(res => res.json()).then(items => {
         const container = document.getElementById('gallery-container');
@@ -742,174 +724,111 @@
       document.getElementById('image-modal').classList.remove('show');
     }
 
-    // DM暗号通信
-    function sendAndOpenDm() {
-      const name = document.getElementById('dm-name').value.trim();
-      const birthday = document.getElementById('dm-birthday').value.trim();
-      const message = document.getElementById('dm-message').value.trim();
+    // --- LINE風 1対1トーク機能 ---
+    function initTalkTab() {
+      const adminSelector = document.getElementById('admin-talk-selector');
+      if (currentUser && currentUser.isAdmin) {
+        adminSelector.style.display = 'block';
+      } else {
+        adminSelector.style.display = 'none';
+      }
+    }
 
-      if (!name || !birthday || !message) {
-        alert('お名前、暗証番号、メッセージをすべて入力してください。');
+    function fetchTalkMessages() {
+      if (!currentUser) return;
+      const targetUser = currentUser.isAdmin ? activeAdminChatUser : currentUser.name;
+      const container = document.getElementById('chat-messages');
+
+      if (currentUser.isAdmin && !targetUser) {
+        container.innerHTML = '<div class="loading">上のセレクトボックスからトーク相手を選択してください。</div>';
+        fetchAdminUserList();
         return;
       }
 
-      currentName = name; currentBirthday = birthday;
-
-      fetch(DM_GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify({ birthday: birthday, name: name, message: message, sender: 'guest' })
-      })
-      .then(res => res.json())
-      .then(() => {
-        document.getElementById('dm-message').value = '';
-        openDmChatUI();
-      })
-      .catch(() => alert('送信に失敗しました。'));
-    }
-
-    function openDmChatUI() {
-      document.getElementById('dm-login-box').style.display = 'none';
-      document.getElementById('dm-chat-box').style.display = 'block';
-      document.getElementById('current-dm-info').innerText = `KEY: [ ${currentBirthday} ] (${currentName})`;
-      fetchDmMessages();
-    }
-
-    function closeDmChat() {
-      document.getElementById('dm-chat-box').style.display = 'none';
-      document.getElementById('dm-login-box').style.display = 'block';
-    }
-
-    function fetchDmMessages() {
-      if (!currentBirthday) return;
-      fetch(`${DM_GAS_URL}?birthday=${encodeURIComponent(currentBirthday)}`)
+      fetch(`${DM_GAS_URL}?user=${encodeURIComponent(targetUser)}`)
         .then(res => res.json())
         .then(resData => {
           const data = resData.data || [];
-          const container = document.getElementById('dm-messages');
           container.innerHTML = '';
           if (data.length === 0) {
-            container.innerHTML = '<div class="loading">NO MESSAGES</div>';
+            container.innerHTML = '<div class="loading">メッセージ履歴がありません。</div>';
             return;
           }
-          data.forEach(item => {
-            const isAdmin = item.sender === 'admin';
+
+          data.forEach(msg => {
+            const isMine = currentUser.isAdmin ? (msg.sender === 'admin') : (msg.sender !== 'admin');
             const bubble = document.createElement('div');
-            bubble.className = `box-bubble ${isAdmin ? 'admin' : 'guest'}`;
+            bubble.className = `chat-bubble ${isMine ? 'mine' : 'other'}`;
             bubble.innerHTML = `
-              <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:var(--text-muted); margin-bottom:6px; letter-spacing:1px;">
-                <span><b>${isAdmin ? 'O-ji (管理人)' : escapeHtml(item.name)}</b></span>
-                <span>${escapeHtml(item.timestamp)}</span>
-              </div>
-              <div style="color:var(--text-main); word-break:break-all; font-weight:300; line-height:1.5;">${escapeHtml(item.message)}</div>
+              <div>${escapeHtml(msg.message)}</div>
+              <div class="chat-time">${escapeHtml(msg.timestamp || '')}</div>
             `;
             container.appendChild(bubble);
           });
           container.scrollTop = container.scrollHeight;
-        }).catch(() => {});
-    }
+        })
+        .catch(() => {
+          container.innerHTML = '<div class="loading">通信に失敗しました。</div>';
+        });
 
-    function sendDmReply(e) {
-      e.preventDefault();
-      const input = document.getElementById('dm-reply-msg');
-      const message = input.value.trim();
-      if (!message || !currentBirthday) return;
-
-      fetch(DM_GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify({ birthday: currentBirthday, name: currentName, message: message, sender: 'guest' })
-      })
-      .then(res => res.json())
-      .then(() => {
-        input.value = '';
-        fetchDmMessages();
-      })
-      .catch(() => alert('送信に失敗しました。'));
-    }
-
-    function loginAsAdmin() {
-      const passkey = document.getElementById('admin-passkey').value.trim();
-      if (passkey !== "20040808") {
-        alert('パスキーが正しくありません。');
-        return;
+      if (currentUser.isAdmin) {
+        fetchAdminUserList();
       }
-      document.getElementById('dm-guest-section').style.display = 'none';
-      document.getElementById('admin-dashboard').style.display = 'block';
-      fetchAdminData(passkey);
     }
 
-    function logoutAdmin() {
-      document.getElementById('admin-dashboard').style.display = 'none';
-      document.getElementById('dm-guest-section').style.display = 'block';
-      document.getElementById('admin-passkey').value = '';
-    }
-
-    function fetchAdminData(passkey) {
-      fetch(`${DM_GAS_URL}?passkey=${encodeURIComponent(passkey)}`)
+    function fetchAdminUserList() {
+      fetch(`${DM_GAS_URL}?action=getUserList`)
         .then(res => res.json())
         .then(resData => {
-          const listContainer = document.getElementById('admin-messages-list');
-          listContainer.innerHTML = '';
-          const data = resData.data || [];
-          if (data.length === 0) {
-            listContainer.innerHTML = '<div class="loading">NO MESSAGES FOUND</div>';
-            return;
-          }
-
-          const groups = {};
-          data.forEach(item => {
-            if (!groups[item.birthday]) groups[item.birthday] = [];
-            groups[item.birthday].push(item);
+          const select = document.getElementById('user-chat-select');
+          const users = resData.users || [];
+          select.innerHTML = '<option value="">トーク相手を選択...</option>';
+          users.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u;
+            opt.textContent = u;
+            if (u === activeAdminChatUser) opt.selected = true;
+            select.appendChild(opt);
           });
-
-          for (let bday in groups) {
-            const thread = groups[bday];
-            const guestName = thread.find(t => t.sender !== 'admin')?.name || 'ゲスト';
-            
-            const card = document.createElement('div');
-            card.className = 'post-card';
-            
-            let messagesHtml = '';
-            thread.forEach(t => {
-              const isAdmin = t.sender === 'admin';
-              messagesHtml += `
-                <div style="background: ${isAdmin ? 'rgba(192,132,252,0.08)' : 'rgba(4,5,8,0.5)'}; padding:10px 12px; border-radius:10px; margin-bottom:8px; font-size:0.8rem;">
-                  <div style="font-size:0.6rem; color:var(--text-muted); display:flex; justify-content:space-between; letter-spacing:1px;">
-                    <span><b>${isAdmin ? 'あなた（管理人）' : escapeHtml(t.name)}</b></span>
-                    <span>${escapeHtml(t.timestamp)}</span>
-                  </div>
-                  <div style="margin-top:6px; word-break:break-all; font-weight:300; line-height:1.5;">${escapeHtml(t.message)}</div>
-                </div>
-              `;
-            });
-
-            card.innerHTML = `
-              <div class="post-header"><span>KEY: ${bday} (${guestName})</span><span>${thread.length}件</span></div>
-              <div style="margin-bottom:12px;">${messagesHtml}</div>
-              <div style="display:flex; gap:8px;">
-                <input type="text" id="admin-reply-${bday}" placeholder="管理人として返信..." style="margin-bottom:0; font-size:0.75rem; padding:10px;">
-                <button onclick="playSound('action'); sendAdminReply('${bday}', '${guestName}')" style="width:auto; padding:10px 16px; font-size:0.65rem;">返信</button>
-              </div>
-            `;
-            listContainer.appendChild(card);
-          }
-        }).catch(() => alert('データの取得に失敗しました。'));
+        })
+        .catch(() => {});
     }
 
-    function sendAdminReply(birthday, name) {
-      const input = document.getElementById(`admin-reply-${birthday}`);
+    function changeAdminChatTarget() {
+      activeAdminChatUser = document.getElementById('user-chat-select').value;
+      fetchTalkMessages();
+    }
+
+    function sendChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-reply-input');
       const message = input.value.trim();
-      if (!message) return;
+      if (!message || !currentUser) return;
+
+      const targetUser = currentUser.isAdmin ? activeAdminChatUser : currentUser.name;
+      if (currentUser.isAdmin && !targetUser) {
+        alert('トーク相手を選択してください。');
+        return;
+      }
+
+      const payload = {
+        user: targetUser,
+        name: currentUser.name,
+        message: message,
+        sender: currentUser.isAdmin ? 'admin' : 'user'
+      };
 
       fetch(DM_GAS_URL, {
         method: 'POST',
-        body: JSON.stringify({ birthday: birthday, name: name, message: message, sender: 'admin' })
+        body: JSON.stringify(payload)
       })
       .then(res => res.json())
       .then(() => {
         input.value = '';
-        loginAsAdmin();
+        playSound('action');
+        fetchTalkMessages();
       })
-      .catch(() => alert('返信に失敗しました。'));
+      .catch(() => alert('送信に失敗しました。'));
     }
 
     document.addEventListener('DOMContentLoaded', initSession);
