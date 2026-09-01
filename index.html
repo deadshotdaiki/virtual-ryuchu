@@ -311,6 +311,16 @@
   <!-- 1. タイムライン -->
   <div id="tab-timeline" class="card active">
     <div class="section-title">Timeline</div>
+    
+    <!-- 新規ツイート投稿フォーム -->
+    <div style="background: rgba(4, 5, 8, 0.6); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; margin-bottom: 24px;">
+      <div style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px;">NEW POST</div>
+      <input type="text" id="new-post-author" placeholder="お名前（例: おうじ）" style="font-size: 0.75rem; padding: 10px 14px; margin-bottom: 8px;">
+      <textarea id="new-post-text" rows="2" placeholder="いまどうしてる？" style="font-size: 0.75rem; padding: 10px 14px; margin-bottom: 8px; resize: none;"></textarea>
+      <input type="text" id="new-post-image" placeholder="画像ファイル名またはURL（任意）" style="font-size: 0.75rem; padding: 10px 14px; margin-bottom: 12px;">
+      <button onclick="playSound('action'); addNewPost()" style="padding: 10px; font-size: 0.65rem;">POST</button>
+    </div>
+
     <div id="timeline-container"><div class="loading">ESTABLISHING SECURE LINK...</div></div>
   </div>
 
@@ -495,12 +505,60 @@
         .then(res => res.json())
         .then(jsonPosts => {
           const localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-          // ローカル投稿がなければ初期JSONをベースにする
           const allPosts = localPosts.length > 0 ? localPosts : jsonPosts;
           renderTimeline(allPosts);
         })
         .catch(() => {
           const localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+          renderTimeline(localPosts);
+        });
+    }
+
+    // 新規ツイート（ポスト）追加機能
+    function addNewPost() {
+      const authorInput = document.getElementById('new-post-author');
+      const textInput = document.getElementById('new-post-text');
+      const imageInput = document.getElementById('new-post-image');
+
+      const text = textInput.value.trim();
+      if (!text) {
+        alert('本文を入力してください。');
+        return;
+      }
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}.${String(now.getHours()).padStart(2,'0')}.${String(now.getMinutes()).padStart(2,'0')}`;
+
+      const newPost = {
+        id: 'post-' + Date.now(),
+        author: authorInput.value.trim() || 'O-ji',
+        date: dateStr,
+        text: text,
+        image: imageInput.value.trim(),
+        comments: []
+      };
+
+      fetch('posts.json')
+        .then(res => res.json())
+        .then(jsonPosts => {
+          let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+          if (localPosts.length === 0) {
+            localPosts = jsonPosts;
+          }
+          localPosts.unshift(newPost);
+          localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
+          
+          textInput.value = '';
+          imageInput.value = '';
+          renderTimeline(localPosts);
+        })
+        .catch(() => {
+          let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+          localPosts.unshift(newPost);
+          localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
+          
+          textInput.value = '';
+          imageInput.value = '';
           renderTimeline(localPosts);
         });
     }
@@ -573,7 +631,6 @@
       const now = new Date();
       const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-      // 現在のポストデータを取得して更新
       fetch('posts.json')
         .then(res => res.json())
         .then(jsonPosts => {
