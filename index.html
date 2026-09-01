@@ -1,367 +1,241 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O-ASIS - 仮想ネットワーク空間</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            /* サマーウォーズのOZをイメージした明るくクリーンな空間 */
-            background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 50%, #fdf4ff 100%);
-            color: #1e293b;
-            font-family: 'Zen Kaku Gothic New', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-            position: relative;
-            padding: 40px 20px;
-        }
-        /* 空間に浮かぶ幾何学的な光の演出 */
-        body::before {
-            content: '';
-            position: fixed;
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(0, 210, 255, 0.15) 0%, rgba(255, 0, 128, 0.05) 50%, rgba(255, 255, 255, 0) 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 0;
-            pointer-events: none;
-        }
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 640px;
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* SAO/OZ風のシステムバッジ */
-        .gateway-badge {
-            display: inline-block;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            letter-spacing: 0.3em;
-            color: #0070f3;
-            border: 2px solid rgba(0, 112, 243, 0.3);
-            padding: 6px 18px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 15px rgba(0, 112, 243, 0.1);
-        }
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(36px, 8vw, 64px);
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            color: #0f172a;
-            margin-bottom: 6px;
-            text-shadow: 0 2px 10px rgba(0, 112, 243, 0.15);
-        }
-        .subtitle {
-            font-size: 13px;
-            color: #64748b;
-            letter-spacing: 0.3em;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            font-family: 'Orbitron', sans-serif;
-        }
-        /* ホログラム風ステータスボード */
-        .status-board {
-            background: rgba(255, 255, 255, 0.85);
-            border: 2px solid #0070f3;
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 30px;
-            text-align: left;
-            box-shadow: 0 8px 30px rgba(0, 112, 243, 0.12);
-            backdrop-filter: blur(8px);
-        }
-        .status-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            letter-spacing: 0.2em;
-            color: #0070f3;
-            margin-bottom: 6px;
-            font-weight: 700;
-        }
-        .status-text {
-            font-size: 14px;
-            color: #334155;
-            line-height: 1.6;
-        }
-        /* 壁打ちコーナー（入力エリア） */
-        .wall-section {
-            background: rgba(255, 255, 255, 0.85);
-            border: 2px solid #ec4899;
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 35px;
-            text-align: left;
-            box-shadow: 0 8px 30px rgba(236, 72, 153, 0.12);
-            backdrop-filter: blur(8px);
-        }
-        .section-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            letter-spacing: 0.2em;
-            color: #ec4899;
-            margin-bottom: 12px;
-            font-weight: 700;
-        }
-        .wall-form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .wall-input, .wall-textarea {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            color: #1e293b;
-            padding: 10px 14px;
-            border-radius: 4px;
-            font-family: 'Zen Kaku Gothic New', sans-serif;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .wall-input:focus, .wall-textarea:focus {
-            border-color: #ec4899;
-            background: #ffffff;
-        }
-        .wall-textarea {
-            resize: vertical;
-            height: 80px;
-        }
-        .wall-submit {
-            background: linear-gradient(135deg, #ec4899, #0070f3);
-            color: #ffffff;
-            border: none;
-            padding: 11px;
-            border-radius: 4px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 12px;
-            letter-spacing: 0.15em;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-        .wall-submit:hover {
-            opacity: 0.95;
-            transform: translateY(-1px);
-        }
-        /* タイムライン・ログ共通カード */
-        .timeline {
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .post-card, .wall-card {
-            background: rgba(255, 255, 255, 0.85);
-            border: 1px solid #cbd5e1;
-            border-left: 4px solid #0070f3;
-            border-radius: 6px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(8px);
-        }
-        .wall-card {
-            border-left-color: #ec4899;
-        }
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #64748b;
-            margin-bottom: 10px;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 0.1em;
-        }
-        .post-header span:first-child {
-            color: #0070f3;
-            font-weight: 700;
-        }
-        .wall-card .post-header span:first-child {
-            color: #ec4899;
-        }
-        .post-text {
-            font-size: 15px;
-            color: #1e293b;
-            line-height: 1.7;
-            white-space: pre-wrap;
-        }
-        .post-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-            margin-top: 15px;
-        }
-        .loading {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 13px;
-            padding: 15px;
-            font-family: 'Orbitron', sans-serif;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>O-ASIS - VIRTUAL NETWORK SPACE</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f4ff 0%, #eef2f3 100%);
+      color: #1a1a2e;
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+      color: #0f172a;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .status-box {
+      border-color: #3b82f6;
+    }
+    .wall-box {
+      border-color: #ec4899;
+    }
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(135deg, #3b82f6 0%, #ec4899 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+    .post-card, .wall-card {
+      background: #fff;
+      border-left: 4px solid #3b82f6;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .wall-card {
+      border-left-color: #ec4899;
+    }
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    .post-text {
+      font-size: 0.95rem;
+      word-break: break-all;
+    }
+    .post-image {
+      width: 100%;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+    .loading {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      padding: 10px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="gateway-badge">SYSTEM // O-ASIS GATEWAY</div>
-        <h1>O-ASIS</h1>
-        <p class="subtitle">Virtual Network Space</p>
-        
-        <!-- O-jiのステータス -->
-        <div class="status-board">
-            <div class="status-title">O-ji's Status</div>
-            <div id="status-content" class="status-text">リンク確立中...</div>
-        </div>
 
-        <!-- 壁打ちコーナー -->
-        <div class="wall-section">
-            <div class="section-title">Anonymous Wall / 壁打ち回線</div>
-            <form id="wall-form" class="wall-form">
-                <input type="text" id="wall-name" class="wall-input" placeholder="名前 (省略時は Anonymous)" maxlength="20">
-                <textarea id="wall-message" class="wall-textarea" placeholder="ここに思考や言葉を放り投げろ..." required></textarea>
-                <button type="submit" id="wall-submit-btn" class="wall-submit">TRANSMIT</button>
-            </form>
-        </div>
+  <h1>O-ASIS</h1>
+  <div class="subtitle">VIRTUAL NETWORK SPACE</div>
 
-        <!-- 壁打ちログ -->
-        <div id="wall-container" class="timeline" style="margin-bottom: 35px;">
-            <div class="loading">壁打ち回線を受信中...</div>
-        </div>
+  <!-- ステータス表示 -->
+  <div class="card status-box">
+    <div class="section-title" style="color: #3b82f6;">O-ji's Status</div>
+    <div id="status-container">リンク確立中...</div>
+  </div>
 
-        <!-- O-jiのタイムライン -->
-        <div id="timeline-container" class="timeline">
-            <div class="loading">ネットワークデータを同期中...</div>
-        </div>
+  <!-- 壁打ち回線 -->
+  <div class="card wall-box">
+    <div class="section-title" style="color: #ec4899;">Anonymous Wall / 壁打ち回線</div>
+    <form id="wall-form">
+      <input type="text" id="wall-name" placeholder="名前（省略時は Anonymous）">
+      <textarea id="wall-message" rows="3" placeholder="ここに思考や言葉を放り投げろ..." required></textarea>
+      <button type="submit" id="wall-submit-btn">TRANSMIT</button>
+    </form>
+    <div id="wall-container">
+      <div class="loading">壁打ち回線を受信中...</div>
     </div>
+  </div>
 
-    <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxnmJd6XYKDCB18SQMfph_SYnYZPvDiMzAYBnvBEFM_Tek27IUM0_iZf901030jz1zySw/exec;
+  <!-- タイムライン -->
+  <div class="card">
+    <div class="section-title">Timeline</div>
+    <div id="timeline-container">
+      <div class="loading">ネットワークデータを同期中...</div>
+    </div>
+  </div>
 
-        // ステータス読み込み
-        fetch('status.txt?' + new Date().getTime())
-            .then(res => res.text())
-            .then(text => {
-                if (text.trim()) document.getElementById('status-content').innerText = text.trim();
-            })
-            .catch(() => { document.getElementById('status-content').innerText = 'シグナルなし。'; });
+  <script>
+    // 指定されたGASのURLをセット
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxnmJd6XYKDCB18SQMfph_SYnYZPvDiMZAYBnvBEFM_Tek27IUM0_iZf901030jz1zySw/exec";
 
-        // O-jiのタイムライン読み込み
-        fetch('posts.json?' + new Date().getTime())
-            .then(res => res.json())
-            .then(posts => {
-                const container = document.getElementById('timeline-container');
-                container.innerHTML = '';
-                if (posts.length === 0) return;
+    // ステータス読込
+    fetch('status.txt')
+      .then(res => res.text())
+      .then(text => {
+        const el = document.getElementById('status-container');
+        if (el) el.innerText = text;
+      }).catch(() => {});
 
-                posts.forEach(post => {
-                    const card = document.createElement('div');
-                    card.className = 'post-card';
-                    let imageHtml = post.image ? `<img src="${post.image}" class="post-image">` : '';
-                    card.innerHTML = `
-                        <div class="post-header"><span>O-ji</span><span>${post.date}</span></div>
-                        <div class="post-text">${post.text}</div>
-                        ${imageHtml}
-                    `;
-                    container.appendChild(card);
-                });
-            }).catch(() => {});
-
-        // 壁打ちログ読み込み
-        function loadWallMessages() {
-            if (!GAS_URL || GAS_URL.includes("https://script.google.com/macros/s/AKfycbxnmJd6XYKDCB18SQMfph_SYnYZPvDiMzAYBnvBEFM_Tek27IUM0_iZf901030jz1zySw/exec")) return;
-            fetch(GAS_URL)
-                .then(res => res.json())
-                .then(data => {
-                    const container = document.getElementById('wall-container');
-                    container.innerHTML = '';
-                    if (data.length === 0) {
-                        container.innerHTML = '<div class="loading">まだ誰も言葉を置いていません。</div>';
-                        return;
-                    }
-                    data.forEach(item => {
-                        const card = document.createElement('div');
-                        card.className = 'wall-card';
-                        card.innerHTML = `
-                            <div class="post-header"><span>${escapeHtml(item.name)}</span><span>${escapeHtml(item.timestamp)}</span></div>
-                            <div class="post-text">${escapeHtml(item.message)}</div>
-                        `;
-                        container.appendChild(card);
-                    });
-                })
-                .catch(() => {
-                    document.getElementById('wall-container').innerHTML = '<div class="loading">壁打ち回線の同期に失敗しました。</div>';
-                });
-        }
-
-        // 送信処理
-        document.getElementById('wall-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (!GAS_URL || GAS_URL.includes("ここ")) {
-                alert("GASのURLが設定されていません。");
-                return;
-            }
-
-            const nameBtn = document.getElementById('wall-name');
-            const msgBtn = document.getElementById('wall-message');
-            const submitBtn = document.getElementById('wall-submit-btn');
-
-            const payload = {
-                name: nameBtn.value.trim(),
-                message: msgBtn.value.trim()
-            };
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = "TRANSMITTING...";
-
-            fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                if(res.status === "success") {
-                    msgBtn.value = '';
-                    loadWallMessages();
-                }
-                submitBtn.disabled = false;
-                submitBtn.innerText = "TRANSMIT";
-            })
-            .catch(() => {
-                alert("送信に失敗しました。");
-                submitBtn.disabled = false;
-                submitBtn.innerText = "TRANSMIT";
-            });
+    // タイムライン読込
+    fetch('posts.json')
+      .then(res => res.json())
+      .then(posts => {
+        const container = document.getElementById('timeline-container');
+        if (!container) return;
+        container.innerHTML = '';
+        if (posts.length === 0) return;
+        posts.forEach(post => {
+          const card = document.createElement('div');
+          card.className = 'post-card';
+          let imageHtml = post.image ? `<img src="${post.image}" class="post-image">` : '';
+          card.innerHTML = `
+            <div class="post-header"><span>O-ji</span><span>${post.date}</span></div>
+            <div class="post-text">${post.text}</div>
+            ${imageHtml}
+          `;
+          container.appendChild(card);
         });
+      }).catch(() => {});
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    // 壁打ち回線読込
+    function loadWallMessages() {
+      if (!GAS_URL) return;
+      fetch(GAS_URL)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('wall-container');
+          if (!container) return;
+          container.innerHTML = '';
+          if (data.length === 0) {
+            container.innerHTML = '<div class="loading">まだ誰も言葉を置いていません。</div>';
+            return;
+          }
+          data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'wall-card';
+            card.innerHTML = `
+              <div class="post-header"><span>${escapeHtml(item.name || 'Anonymous')}</span><span>${escapeHtml(item.timestamp || '')}</span></div>
+              <div class="post-text">${escapeHtml(item.message || '')}</div>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(() => {
+          const container = document.getElementById('wall-container');
+          if (container) container.innerHTML = '<div class="loading">壁打ち回線の同期に失敗しました</div>';
+        });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>]/g, function (match) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[match];
+      });
+    }
+
+    loadWallMessages();
+
+    // 送信処理
+    const form = document.getElementById('wall-form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!GAS_URL) {
+          alert('GASのURLが設定されていません。');
+          return;
         }
+        const nameInput = document.getElementById('wall-name');
+        const msgInput = document.getElementById('wall-message');
+        const name = nameInput ? nameInput.value : '';
+        const message = msgInput ? msgInput.value : '';
+        if (!message) return;
 
-        loadWallMessages();
-    </script>
+        fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ name: name, message: message })
+        })
+        .then(res => res.json())
+        .then(() => {
+          if (msgInput) msgInput.value = '';
+          loadWallMessages();
+        })
+        .catch(() => {
+          alert('送信に失敗しました。');
+        });
+      });
+    }
+  </script>
 </body>
 </html>
