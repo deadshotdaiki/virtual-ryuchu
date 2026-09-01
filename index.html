@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>O-ASIS // VIRTUAL RYUCHU NETWORK SPACE</title>
+  <title>O-ASIS // VIRTUAL NETWORK SPACE</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
 
@@ -28,391 +28,73 @@
       align-items: center;
       min-height: 100vh;
       box-sizing: border-box;
-      overflow-x: hidden;
-      position: relative;
     }
 
-    body::before {
-      content: '';
-      position: fixed;
-      top: -30%;
-      left: 20%;
-      width: 60vw;
-      height: 60vw;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.07) 0%, rgba(168, 85, 247, 0.03) 40%, transparent 70%);
-      z-index: -1;
-      pointer-events: none;
-      filter: blur(60px);
-      animation: floatOrb 12s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatOrb {
-      0% { transform: translate(-10%, -10%) scale(1); }
-      100% { transform: translate(10%, 15%) scale(1.1); }
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
+    header { text-align: center; margin-bottom: 28px; }
     h1 {
-      font-size: 1.8rem;
-      letter-spacing: 6px;
-      margin: 0 0 6px 0;
-      font-weight: 500;
-      background: var(--primary-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 25px rgba(192, 132, 252, 0.25));
+      font-size: 1.8rem; letter-spacing: 6px; margin: 0 0 6px 0; font-weight: 500;
+      background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
+    .subtitle { font-size: 0.7rem; letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase; font-weight: 300; }
 
-    .subtitle {
-      font-size: 0.7rem;
-      letter-spacing: 4px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-weight: 300;
-    }
-
-    /* タブメニュー */
     .tab-container {
-      display: flex;
-      width: 100%;
-      max-width: 520px;
-      margin-bottom: 24px;
-      background: rgba(10, 11, 18, 0.6);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--glass-border);
-      border-radius: 14px;
-      padding: 5px;
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      display: flex; width: 100%; max-width: 520px; margin-bottom: 24px;
+      background: rgba(10, 11, 18, 0.6); backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border); border-radius: 14px; padding: 5px; box-sizing: border-box;
     }
-
     .tab-btn {
-      flex: 1;
-      padding: 10px 4px;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-family: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      text-align: center;
-      font-size: 0.7rem;
-      letter-spacing: 1px;
-      border-radius: 10px;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      flex: 1; padding: 10px 4px; background: transparent; border: none; color: var(--text-muted);
+      font-family: inherit; font-weight: 500; cursor: pointer; text-align: center; font-size: 0.7rem; letter-spacing: 1px; border-radius: 10px; transition: all 0.3s ease;
     }
-
-    .tab-btn:hover {
-      color: var(--text-main);
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .tab-btn.active {
-      background: rgba(255, 255, 255, 0.08);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-    }
+    .tab-btn:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.03); }
+    .tab-btn.active { background: rgba(255, 255, 255, 0.08); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.12); }
 
     .card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 24px;
-      width: 100%;
-      max-width: 520px;
-      margin-bottom: 20px;
-      box-sizing: border-box;
-      display: none;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      background: var(--glass-bg); backdrop-filter: blur(28px); border: 1px solid var(--glass-border);
+      border-radius: 20px; padding: 24px; width: 100%; max-width: 520px; margin-bottom: 20px; box-sizing: border-box; display: none; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
     }
-
-    .card.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px) scale(0.99); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    .card.active { display: block; }
 
     .section-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: var(--text-muted);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 0.75rem; font-weight: 600; margin-bottom: 16px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;
     }
-
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, var(--glass-border), transparent);
-    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--glass-border), transparent); }
     
-    input, textarea {
-      width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 12px;
-      border: 1px solid var(--glass-border);
-      background: rgba(5, 6, 10, 0.6);
-      color: var(--text-main);
-      font-family: inherit;
-      border-radius: 12px;
-      box-sizing: border-box;
-      font-size: 0.85rem;
-      transition: all 0.25s ease;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    input, textarea, select {
+      width: 100%; padding: 12px 14px; margin-bottom: 12px; border: 1px solid var(--glass-border);
+      background: rgba(5, 6, 10, 0.6); color: var(--text-main); font-family: inherit; border-radius: 12px; box-sizing: border-box; font-size: 0.85rem;
     }
-
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: rgba(192, 132, 252, 0.5);
-      background: rgba(5, 6, 10, 0.85);
-      box-shadow: 0 0 20px rgba(168, 85, 247, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: rgba(192, 132, 252, 0.5); }
 
     button {
-      width: 100%;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.08);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      font-family: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      letter-spacing: 2px;
-      font-size: 0.75rem;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.08); color: white;
+      border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; font-family: inherit; font-weight: 500; cursor: pointer; letter-spacing: 2px; font-size: 0.75rem; transition: all 0.25s ease;
     }
+    button:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3); }
 
-    button:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.3);
-      box-shadow: 0 6px 24px rgba(168, 85, 247, 0.25);
-      transform: translateY(-1px);
-    }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .gallery-item { background: rgba(14, 16, 26, 0.6); border: 1px solid var(--glass-border); border-radius: 14px; overflow: hidden; cursor: pointer; }
+    .gallery-image { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+    .gallery-info { padding: 10px; font-size: 0.75rem; color: var(--text-muted); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ギャラリー用グリッドレイアウト */
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .gallery-item {
-      background: rgba(14, 16, 26, 0.6);
-      border: 1px solid var(--glass-border);
-      border-radius: 14px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .gallery-item:hover {
-      border-color: var(--glass-border-hover);
-      box-shadow: 0 8px 24px rgba(168, 85, 247, 0.2);
-      transform: translateY(-2px);
-    }
-
-    .gallery-image {
-      width: 100%;
-      aspect-ratio: 1;
-      object-fit: cover;
-      display: block;
-    }
-
-    .gallery-info {
-      padding: 10px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-align: center;
-      letter-spacing: 1px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* 拡大モーダル画面 */
     .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(3, 4, 7, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      box-sizing: border-box;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(3, 4, 7, 0.85); backdrop-filter: blur(12px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
     }
+    .modal.show { display: flex; }
+    .modal-content { background: rgba(18, 20, 32, 0.85); border: 1px solid var(--glass-border-hover); border-radius: 20px; max-width: 480px; width: 100%; padding: 20px; box-sizing: border-box; text-align: center; }
+    .modal-image { width: 100%; max-height: 60vh; object-fit: contain; border-radius: 12px; margin-bottom: 16px; background: #000; }
 
-    .modal.show {
-      display: flex;
-      opacity: 1;
-    }
+    .post-card { background: rgba(14, 16, 26, 0.5); border: 1px solid var(--glass-border); border-left: 2px solid #c084fc; padding: 16px; margin-top: 14px; border-radius: 14px; }
+    .post-header { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; }
+    .post-text { font-size: 0.9rem; word-break: break-all; color: #e5e7eb; line-height: 1.6; font-weight: 300; }
 
-    .modal-content {
-      background: rgba(18, 20, 32, 0.85);
-      border: 1px solid var(--glass-border-hover);
-      border-radius: 20px;
-      max-width: 480px;
-      width: 100%;
-      padding: 20px;
-      box-sizing: border-box;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
-      text-align: center;
-      position: relative;
-      animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    .link-item { display: block; padding: 16px; margin-bottom: 10px; background: rgba(14, 16, 26, 0.5); border: 1px solid var(--glass-border); border-radius: 14px; color: var(--text-main); text-decoration: none; font-size: 0.85rem; }
 
-    @keyframes zoomIn {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .modal-image {
-      width: 100%;
-      max-height: 60vh;
-      object-fit: contain;
-      border-radius: 12px;
-      border: 1px solid var(--glass-border);
-      margin-bottom: 16px;
-      background: #000;
-    }
-
-    .modal-title {
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: var(--text-main);
-      margin-bottom: 8px;
-      letter-spacing: 1px;
-    }
-
-    .modal-desc {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 20px;
-      font-weight: 300;
-      word-break: break-all;
-    }
-
-    .post-card {
-      background: rgba(14, 16, 26, 0.5);
-      border: 1px solid var(--glass-border);
-      border-left: 2px solid #c084fc;
-      padding: 16px;
-      margin-top: 14px;
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
-
-    .comment-card {
-      background: rgba(8, 10, 16, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-left: 2px solid #818cf8;
-      padding: 10px 12px;
-      margin-top: 8px;
-      border-radius: 10px;
-      font-size: 0.8rem;
-    }
-
-    .post-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      letter-spacing: 1px;
-    }
-
-    .post-text {
-      font-size: 0.9rem;
-      word-break: break-all;
-      color: #e5e7eb;
-      line-height: 1.6;
-      font-weight: 300;
-    }
-
-    .post-image {
-      width: 100%;
-      border-radius: 10px;
-      border: 1px solid var(--glass-border);
-      margin-top: 12px;
-    }
-
-    .comment-section {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .comment-form {
-      margin-top: 10px;
-    }
-
-    .comment-form input, .comment-form textarea {
-      font-size: 0.75rem;
-      padding: 8px 10px;
-      margin-bottom: 6px;
-    }
-
-    .comment-form button {
-      padding: 8px;
-      font-size: 0.7rem;
-    }
-
-    .link-item {
-      display: block;
-      padding: 16px;
-      margin-bottom: 10px;
-      background: rgba(14, 16, 26, 0.5);
-      border: 1px solid var(--glass-border);
-      border-radius: 14px;
-      color: var(--text-main);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.85rem;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      box-sizing: border-box;
-    }
-
-    .link-item:hover {
-      background: rgba(25, 28, 45, 0.7);
-      border-color: rgba(192, 132, 252, 0.4);
-      box-shadow: 0 8px 24px rgba(168, 85, 247, 0.15);
-      transform: translateY(-1px);
-    }
-
-    .loading {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      padding: 24px;
-      letter-spacing: 2px;
-    }
+    .box-bubble { background: rgba(14, 16, 26, 0.7); border: 1px solid var(--glass-border); padding: 12px 14px; margin-bottom: 10px; border-radius: 12px; font-size: 0.85rem; }
+    .box-bubble.admin { border-left: 3px solid #c084fc; }
+    .box-bubble.guest { border-left: 3px solid #818cf8; }
+    .loading { text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 24px; }
   </style>
 </head>
 <body>
@@ -422,55 +104,98 @@
     <div class="subtitle">Virtual Network Space</div>
   </header>
 
-  <!-- タブメニュー -->
   <div class="tab-container">
     <button class="tab-btn active" onclick="switchTab('timeline', event)">TIMELINE</button>
     <button class="tab-btn" onclick="switchTab('status', event)">STATUS</button>
     <button class="tab-btn" onclick="switchTab('gallery', event)">GALLERY</button>
+    <button class="tab-btn" onclick="switchTab('dm', event)">DM</button>
     <button class="tab-btn" onclick="switchTab('contact', event)">CONTACT</button>
   </div>
 
-  <!-- 1. タイムラインタブ -->
   <div id="tab-timeline" class="card active">
     <div class="section-title">Timeline</div>
-    <div id="timeline-container">
-      <div class="loading">ESTABLISHING LINK...</div>
-    </div>
+    <div id="timeline-container"><div class="loading">ESTABLISHING LINK...</div></div>
   </div>
 
-  <!-- 2. ステータスタブ -->
   <div id="tab-status" class="card">
     <div class="section-title">O-ji's Status</div>
     <div id="status-container" style="white-space: pre-wrap; font-size: 0.85rem; font-weight: 300; line-height: 1.6; color: #e5e7eb;">INITIALIZING...</div>
   </div>
 
-  <!-- 3. ギャラリータブ -->
   <div id="tab-gallery" class="card">
     <div class="section-title">Gallery Archive</div>
-    <div id="gallery-container">
-      <div class="loading">LOADING ASSETS...</div>
+    <div id="gallery-container"><div class="loading">LOADING ASSETS...</div></div>
+  </div>
+
+  <div id="tab-dm" class="card">
+    <div class="section-title">Direct Message</div>
+    
+    <div style="background: rgba(5, 6, 10, 0.4); border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; margin-bottom: 16px;">
+      <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 6px;">CURRENT STATUS</div>
+      <div id="current-status-text" style="font-size: 0.85rem; font-weight: 500; color: #c084fc; margin-bottom: 8px;">(通常営業中)</div>
+      <input type="text" id="status-input" placeholder="ステータスを編集（例: 外出中 / 忙しい）" style="margin-bottom: 8px; font-size: 0.75rem; padding: 8px;">
+      <button onclick="updateStatusText()" style="padding: 6px; font-size: 0.7rem;">UPDATE STATUS</button>
+    </div>
+
+    <div id="dm-guest-section">
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6;">
+        DM（名前と内容を入れて送ると僕から返信がきます、誕生日を入れると他の人には見られないプライベートチャットになります）
+      </p>
+
+      <div id="dm-login-box">
+        <input type="text" id="dm-name" placeholder="お名前">
+        <input type="text" id="dm-birthday" placeholder="誕生日（例: 1206 ※合言葉になります）">
+        <textarea id="dm-message" rows="3" placeholder="メッセージ..."></textarea>
+        <button onclick="sendAndOpenDm()">SEND MESSAGE</button>
+      </div>
+
+      <div id="dm-chat-box" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span id="current-dm-info" style="font-size: 0.75rem; color: #c084fc;"></span>
+          <button onclick="closeDmChat()" style="width: auto; padding: 4px 10px; font-size: 0.65rem;">EXIT</button>
+        </div>
+        <div id="dm-messages" style="max-height: 250px; overflow-y: auto; margin-bottom: 12px; padding-right: 4px;"></div>
+        <form onsubmit="sendDmReply(event)">
+          <input type="text" id="dm-reply-msg" placeholder="返信を入力..." required>
+          <button type="submit">REPLY</button>
+        </form>
+      </div>
+
+      <div style="margin-top: 24px; border-top: 1px solid var(--glass-border); padding-top: 16px;">
+        <details style="font-size: 0.75rem; color: var(--text-muted);">
+          <summary style="cursor: pointer; margin-bottom: 8px;">管理者用ログイン</summary>
+          <input type="password" id="admin-passkey" placeholder="パスキーを入力 (20040808)" style="font-size: 0.75rem; padding: 8px; margin-bottom: 8px;">
+          <button onclick="loginAsAdmin()" style="padding: 8px; font-size: 0.7rem;">LOGIN AS ADMIN</button>
+        </details>
+      </div>
+    </div>
+
+    <div id="admin-dashboard" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 0.75rem; color: #c084fc;">ADMIN PANEL (ALL DMS)</span>
+        <button onclick="logoutAdmin()" style="width: auto; padding: 4px 10px; font-size: 0.65rem;">LOGOUT</button>
+      </div>
+      <div id="admin-messages-list" style="max-height: 400px; overflow-y: auto;"></div>
     </div>
   </div>
 
-  <!-- 4. 連絡先タブ -->
   <div id="tab-contact" class="card">
     <div class="section-title">Contact</div>
-    <a href="mailto:deadshotdaiki@gmail.com" class="link-item" onclick="playAudio('click')">
+    <a href="mailto:deadshotdaiki@gmail.com" class="link-item">
       <span>✉️ Send Mail</span>
       <span style="font-size:0.75rem; color:var(--text-muted); display:block; font-weight:300; margin-top:4px;">deadshotdaiki@gmail.com</span>
     </a>
-    <div class="link-item" onclick="copyDiscord(); playAudio('click');" style="cursor: pointer;">
+    <div class="link-item" onclick="copyDiscord();" style="cursor: pointer;">
       <span>💬 Copy Discord ID</span>
       <span style="font-size:0.75rem; color:var(--text-muted); display:block; font-weight:300; margin-top:4px;">vamos_cantar (Click to Copy)</span>
     </div>
   </div>
 
-  <!-- 拡大表示用モーダル -->
   <div id="image-modal" class="modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
-      <img id="modal-img" class="modal-image" src="" alt="Zoomed Image">
-      <div id="modal-title" class="modal-title"></div>
-      <div id="modal-desc" class="modal-desc"></div>
+      <img id="modal-img" class="modal-image" src="">
+      <div id="modal-title" style="color:#fff; font-size:0.9rem; margin-bottom:8px;"></div>
+      <div id="modal-desc" style="color:var(--text-muted); font-size:0.8rem; margin-bottom:16px;"></div>
       <button onclick="closeModal()">CLOSE</button>
     </div>
   </div>
@@ -478,208 +203,249 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbycDeI_m_ERlsdFSTDF7S4Dl1agQnwzfxQgrEw9OciBmlc4wrvX8rRiAAzoUEJtvNLlBw/exec";
 
-    let audioCtx = null;
-    function playAudio(type) {
-      try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        if (type === 'tab') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(880.00, audioCtx.currentTime + 0.08);
-          gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.08);
-        } else if (type === 'click') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.05);
-          gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.05);
-        }
-      } catch (e) {}
-    }
+    let currentBirthday = "";
+    let currentName = "";
 
     function switchTab(tabName, event) {
-      playAudio('tab');
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
-
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
       event.currentTarget.classList.add('active');
       document.getElementById('tab-' + tabName).classList.add('active');
     }
 
     function copyDiscord() {
-      navigator.clipboard.writeText('vamos_cantar').then(() => {
-        alert('Discord ID [ vamos_cantar ] をコピーしました。');
-      });
+      navigator.clipboard.writeText('vamos_cantar').then(() => alert('Discord ID をコピーしました。'));
     }
 
-    fetch('status.txt')
-      .then(res => res.text())
-      .then(text => {
-        const el = document.getElementById('status-container');
-        if (el) el.innerText = text;
-      }).catch(() => {});
+    // ステータスのロード・保存（localStorage利用）
+    function loadStatus() {
+      const savedStatus = localStorage.getItem('o_asis_status') || '(通常営業中)';
+      document.getElementById('current-status-text').innerText = savedStatus;
+      const statusContainer = document.getElementById('status-container');
+      if (statusContainer) statusContainer.innerText = `現在のステータス:\n${savedStatus}`;
+    }
 
-    // ギャラリーデータ読み込みと拡大モーダル連動
+    function updateStatusText() {
+      const val = document.getElementById('status-input').value.trim();
+      if (!val) return;
+      localStorage.setItem('o_asis_status', val);
+      document.getElementById('status-input').value = '';
+      loadStatus();
+      alert('ステータスを更新しました。');
+    }
+
+    loadStatus();
+
+    fetch('status.txt').then(res => res.text()).then(text => {
+      const saved = localStorage.getItem('o_asis_status');
+      if (!saved) document.getElementById('status-container').innerText = text;
+    }).catch(() => {});
+
     function loadGallery() {
-      fetch('gallery.json')
-        .then(res => res.json())
-        .then(items => {
-          const container = document.getElementById('gallery-container');
-          if (!container) return;
-          container.innerHTML = '';
-          if (!items || items.length === 0) {
-            container.innerHTML = '<div class="loading">NO ASSETS FOUND</div>';
-            return;
-          }
-          const grid = document.createElement('div');
-          grid.className = 'gallery-grid';
-          items.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'gallery-item';
-            div.innerHTML = `
-              <img src="${item.image}" class="gallery-image" alt="Artwork">
-              <div class="gallery-info">${item.title || 'Untitled'}</div>
-            `;
-            // タップされた時にモーダルを開く処理
-            div.onclick = () => {
-              playAudio('click');
-              openModal(item.image, item.title, item.description);
-            };
-            grid.appendChild(div);
-          });
-          container.appendChild(grid);
-        })
-        .catch(() => {
-          const container = document.getElementById('gallery-container');
-          if (container) container.innerHTML = '<div class="loading">FAILED TO LOAD GALLERY</div>';
+      fetch('gallery.json').then(res => res.json()).then(items => {
+        const container = document.getElementById('gallery-container');
+        if (!items) return;
+        container.innerHTML = '';
+        const grid = document.createElement('div');
+        grid.className = 'gallery-grid';
+        items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'gallery-item';
+          div.innerHTML = `<img src="${item.image}" class="gallery-image"><div class="gallery-info">${item.title || ''}</div>`;
+          div.onclick = () => {
+            document.getElementById('modal-img').src = item.image;
+            document.getElementById('modal-title').innerText = item.title || '';
+            document.getElementById('modal-desc').innerText = item.description || '';
+            document.getElementById('image-modal').classList.add('show');
+          };
+          grid.appendChild(div);
         });
-    }
-
-    function openModal(imageSrc, title, description) {
-      const modal = document.getElementById('image-modal');
-      const modalImg = document.getElementById('modal-img');
-      const modalTitle = document.getElementById('modal-title');
-      const modalDesc = document.getElementById('modal-desc');
-
-      modalImg.src = imageSrc;
-      modalTitle.innerText = title || 'Untitled';
-      modalDesc.innerText = description || 'No description provided.';
-      modal.classList.add('show');
+        container.appendChild(grid);
+      }).catch(() => {});
     }
 
     function closeModal() {
-      playAudio('click');
-      const modal = document.getElementById('image-modal');
-      modal.classList.remove('show');
+      document.getElementById('image-modal').classList.remove('show');
     }
 
-    function loadAllData() {
-      loadGallery();
-      if (!GAS_URL) return;
-      fetch(GAS_URL)
+    // ゲストDM機能
+    function sendAndOpenDm() {
+      const name = document.getElementById('dm-name').value.trim();
+      const birthday = document.getElementById('dm-birthday').value.trim();
+      const message = document.getElementById('dm-message').value.trim();
+
+      if (!name || !birthday || !message) {
+        alert('お名前、誕生日、メッセージをすべて入力してください。');
+        return;
+      }
+
+      currentName = name;
+      currentBirthday = birthday;
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({ birthday: birthday, name: name, message: message, sender: 'guest' })
+      })
+      .then(res => res.json())
+      .then(() => {
+        document.getElementById('dm-message').value = '';
+        openDmChatUI();
+      })
+      .catch(() => alert('送信に失敗しました。'));
+    }
+
+    function openDmChatUI() {
+      document.getElementById('dm-login-box').style.display = 'none';
+      document.getElementById('dm-chat-box').style.display = 'block';
+      document.getElementById('current-dm-info').innerText = `KEY: [ ${currentBirthday} ] (${currentName})`;
+      fetchDmMessages();
+    }
+
+    function closeDmChat() {
+      document.getElementById('dm-chat-box').style.display = 'none';
+      document.getElementById('dm-login-box').style.display = 'block';
+    }
+
+    function fetchDmMessages() {
+      if (!currentBirthday) return;
+      fetch(`${GAS_URL}?birthday=${encodeURIComponent(currentBirthday)}`)
         .then(res => res.json())
-        .then(gasData => {
-          fetch('posts.json')
-            .then(res => res.json())
-            .then(posts => {
-              const timelineContainer = document.getElementById('timeline-container');
-              if (!timelineContainer) return;
-              timelineContainer.innerHTML = '';
-              if (posts.length === 0) return;
-
-              posts.forEach((post, index) => {
-                const postId = post.id || 'post-' + index;
-                const card = document.createElement('div');
-                card.className = 'post-card';
-                let imageHtml = post.image ? `<img src="${post.image}" class="post-image">` : '';
-                
-                const postComments = gasData.filter(item => item.postId === postId);
-                let commentsHtml = '';
-                postComments.forEach(c => {
-                  commentsHtml += `
-                    <div class="comment-card">
-                      <div class="post-header"><span>${escapeHtml(c.name || 'ANONYMOUS')}</span><span>${escapeHtml(c.timestamp || '')}</span></div>
-                      <div class="post-text">${escapeHtml(c.message || '')}</div>
-                    </div>
-                  `;
-                });
-                if (postComments.length === 0) {
-                  commentsHtml = '<div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">NO COMMENTS</div>';
-                }
-
-                card.innerHTML = `
-                  <div class="post-header"><span>O-JI</span><span>${post.date}</span></div>
-                  <div class="post-text">${post.text}</div>
-                  ${imageHtml}
-                  <div class="comment-section">
-                    <div style="font-size: 0.75rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 1px;">COMMENTS</div>
-                    ${commentsHtml}
-                    <form class="comment-form" onsubmit="sendPost(event, '${postId}', 'name-${postId}', 'msg-${postId}')">
-                      <input type="text" id="name-${postId}" placeholder="NAME (OPTIONAL)">
-                      <textarea id="msg-${postId}" rows="1" placeholder="REPLY..." required></textarea>
-                      <button type="submit" onclick="playAudio('click')">TRANSMIT</button>
-                    </form>
-                  </div>
-                `;
-                timelineContainer.appendChild(card);
-              });
-            }).catch(() => {
-              const timelineContainer = document.getElementById('timeline-container');
-              if (timelineContainer) timelineContainer.innerHTML = '<div class="loading">FAILED TO LOAD POSTS</div>';
-            });
-        })
-        .catch(() => {
-          const timelineContainer = document.getElementById('timeline-container');
-          if (timelineContainer) timelineContainer.innerHTML = '<div class="loading">SYNC FAILED</div>';
-        });
+        .then(resData => {
+          const data = resData.data || [];
+          const container = document.getElementById('dm-messages');
+          container.innerHTML = '';
+          if (data.length === 0) {
+            container.innerHTML = '<div class="loading">NO MESSAGES</div>';
+            return;
+          }
+          data.forEach(item => {
+            const isAdmin = item.sender === 'admin';
+            const bubble = document.createElement('div');
+            bubble.className = `box-bubble ${isAdmin ? 'admin' : 'guest'}`;
+            bubble.innerHTML = `
+              <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-muted); margin-bottom:4px;">
+                <span><b>${isAdmin ? 'O-ji (管理人)' : escapeHtml(item.name)}</b></span>
+                <span>${escapeHtml(item.timestamp)}</span>
+              </div>
+              <div style="color:var(--text-main); word-break:break-all; font-weight:300;">${escapeHtml(item.message)}</div>
+            `;
+            container.appendChild(bubble);
+          });
+          container.scrollTop = container.scrollHeight;
+        }).catch(() => {});
     }
 
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>]/g, function (match) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[match];
-      });
-    }
-
-    function sendPost(e, postId, nameId, msgId) {
+    function sendDmReply(e) {
       e.preventDefault();
-      if (!GAS_URL) return;
-      const nameInput = document.getElementById(nameId);
-      const msgInput = document.getElementById(msgId);
-      const name = nameInput ? nameInput.value : '';
-      const message = msgInput ? msgInput.value : '';
+      const input = document.getElementById('dm-reply-msg');
+      const message = input.value.trim();
+      if (!message || !currentBirthday) return;
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({ birthday: currentBirthday, name: currentName, message: message, sender: 'guest' })
+      })
+      .then(res => res.json())
+      .then(() => {
+        input.value = '';
+        fetchDmMessages();
+      })
+      .catch(() => alert('送信に失敗しました。'));
+    }
+
+    // 管理人機能（パスキー: 20040808）
+    function loginAsAdmin() {
+      const passkey = document.getElementById('admin-passkey').value.trim();
+      if (passkey !== "20040808") {
+        alert('パスキーが正しくありません。');
+        return;
+      }
+      document.getElementById('dm-guest-section').style.display = 'none';
+      document.getElementById('admin-dashboard').style.display = 'block';
+      fetchAdminData(passkey);
+    }
+
+    function logoutAdmin() {
+      document.getElementById('admin-dashboard').style.display = 'none';
+      document.getElementById('dm-guest-section').style.display = 'block';
+      document.getElementById('admin-passkey').value = '';
+    }
+
+    function fetchAdminData(passkey) {
+      fetch(`${GAS_URL}?passkey=${encodeURIComponent(passkey)}`)
+        .then(res => res.json())
+        .then(resData => {
+          const listContainer = document.getElementById('admin-messages-list');
+          listContainer.innerHTML = '';
+          const data = resData.data || [];
+          if (data.length === 0) {
+            listContainer.innerHTML = '<div class="loading">NO MESSAGES FOUND</div>';
+            return;
+          }
+
+          // 誕生日キーごとにグループ化
+          const groups = {};
+          data.forEach(item => {
+            if (!groups[item.birthday]) groups[item.birthday] = [];
+            groups[item.birthday].push(item);
+          });
+
+          for (let bday in groups) {
+            const thread = groups[bday];
+            const guestName = thread.find(t => t.sender !== 'admin')?.name || 'ゲスト';
+            
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            
+            let messagesHtml = '';
+            thread.forEach(t => {
+              const isAdmin = t.sender === 'admin';
+              messagesHtml += `
+                <div style="background: ${isAdmin ? 'rgba(192,132,252,0.1)' : 'rgba(5,6,10,0.4)'}; padding:8px 10px; border-radius:8px; margin-bottom:6px; font-size:0.8rem;">
+                  <div style="font-size:0.65rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+                    <span><b>${isAdmin ? 'あなた（管理人）' : escapeHtml(t.name)}</b></span>
+                    <span>${escapeHtml(t.timestamp)}</span>
+                  </div>
+                  <div style="margin-top:4px; word-break:break-all;">${escapeHtml(t.message)}</div>
+                </div>
+              `;
+            });
+
+            card.innerHTML = `
+              <div class="post-header"><span>KEY: ${bday} (${guestName})</span><span>${thread.length}件のメッセージ</span></div>
+              <div style="margin-bottom:10px;">${messagesHtml}</div>
+              <div style="display:flex; gap:6px;">
+                <input type="text" id="admin-reply-${bday}" placeholder="管理人として返信..." style="margin-bottom:0; font-size:0.75rem; padding:8px;">
+                <button onclick="sendAdminReply('${bday}', '${guestName}')" style="width:auto; padding:8px 14px; font-size:0.7rem;">返信</button>
+              </div>
+            `;
+            listContainer.appendChild(card);
+          }
+        }).catch(() => alert('データの取得に失敗しました。'));
+    }
+
+    function sendAdminReply(birthday, name) {
+      const input = document.getElementById(`admin-reply-${birthday}`);
+      const message = input.value.trim();
       if (!message) return;
 
       fetch(GAS_URL, {
         method: 'POST',
-        body: JSON.stringify({ name: name, message: message, postId: postId })
+        body: JSON.stringify({ birthday: birthday, name: name, message: message, sender: 'admin' })
       })
       .then(res => res.json())
       .then(() => {
-        if (msgInput) msgInput.value = '';
-        if (nameInput) nameInput.value = '';
-        loadAllData();
+        input.value = '';
+        loginAsAdmin(); // 再読込
       })
-      .catch(() => {
-        alert('TRANSMISSION FAILED.');
-      });
+      .catch(() => alert('返信に失敗しました。'));
     }
 
-    loadAllData();
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+    }
+
+    loadGallery();
   </script>
 </body>
 </html>
