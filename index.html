@@ -2,10 +2,137 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>バーチャル隆中</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>バーチャル隆中 - 隠れ里の玄関</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            font-family: 'Noto Serif JP', serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+        /* 背景の微かな光の演出 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(11, 15, 25, 0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            padding: 40px 20px;
+            animation: fadeIn 2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .gateway-badge {
+            display: inline-block;
+            font-size: 14px;
+            letter-spacing: 0.3em;
+            color: #d4af37;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 6px 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            background: rgba(212, 175, 55, 0.03);
+        }
+        h1 {
+            font-family: 'Zen Old Mincho', serif;
+            font-size: clamp(40px, 7vw, 72px);
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: #f8fafc;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+        .subtitle {
+            font-size: clamp(16px, 2.5vw, 20px);
+            color: #94a3b8;
+            letter-spacing: 0.2em;
+            margin-bottom: 50px;
+            font-weight: 300;
+        }
+        .philosophy-box {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 2px solid #d4af37;
+            border-right: 2px solid rgba(212, 175, 55, 0.1);
+            padding: 30px;
+            margin: 0 auto 50px auto;
+            max-width: 600px;
+            text-align: left;
+            border-radius: 4px;
+        }
+        .philosophy-box p {
+            font-size: 16px;
+            line-height: 2;
+            color: #cbd5e1;
+            letter-spacing: 0.1em;
+        }
+        .philosophy-box .citation {
+            display: block;
+            margin-top: 15px;
+            text-align: right;
+            font-size: 14px;
+            color: #d4af37;
+            letter-spacing: 0.15em;
+        }
+        .status-panel {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 14px;
+            color: #64748b;
+            letter-spacing: 0.1em;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 30px;
+        }
+        .status-item span {
+            color: #38bdf8;
+        }
+    </style>
 </head>
 <body>
-    <h1>バーチャル隆中</h1>
-    <p>静寂と創造の隠れ里へようこそ。</p>
+    <div class="container">
+        <div class="gateway-badge">秘境関所</div>
+        <h1>バーチャル隆中</h1>
+        <p class="subtitle">静寂と創造の隠れ里</p>
+        
+        <div class="philosophy-box">
+            <p>「非淡泊無以明志、非寧静無以致遠」<br>淡泊にあらずんば以て志を明らかにせず、寧静にあらずんば以て遠を致さず。</p>
+            <span class="citation">—— 諸葛亮 『誡子書』</span>
+        </div>
+
+        <div class="status-panel">
+            <div class="status-item">状態: <span>常時研鑽中</span></div>
+            <div class="status-item">領域: <span>結界展開済</span></div>
+        </div>
+    </div>
 </body>
 </html>
+```eof
