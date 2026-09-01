@@ -142,7 +142,7 @@
     <div id="status-container">リンク確立中...</div>
   </div>
 
-  <!-- タイムライン（最上部に配置） -->
+  <!-- タイムライン -->
   <div class="card timeline-box">
     <div class="section-title" style="color: #3b82f6;">Timeline</div>
     <div id="timeline-container">
@@ -150,7 +150,7 @@
     </div>
   </div>
 
-  <!-- 壁打ち回線（フリーコメント用） -->
+  <!-- 壁打ち回線 -->
   <div class="card wall-box">
     <div class="section-title" style="color: #ec4899;">Anonymous Wall / 壁打ち回線</div>
     <form id="wall-form" onsubmit="sendPost(event, 'general', 'wall-name', 'wall-message')">
@@ -174,13 +174,13 @@
         if (el) el.innerText = text;
       }).catch(() => {});
 
-    // 総合データ同期関数（タイムラインと壁打ちをまとめて取得）
+    // データ同期
     function loadAllData() {
       if (!GAS_URL) return;
       fetch(GAS_URL)
         .then(res => res.json())
         .then(gasData => {
-          // 1. 壁打ち回線の描画 (postId === 'general')
+          // 1. 壁打ち回線の描画
           const wallContainer = document.getElementById('wall-container');
           if (wallContainer) {
             wallContainer.innerHTML = '';
@@ -200,7 +200,7 @@
             }
           }
 
-          // 2. タイムラインの読込とコメント紐づけ
+          // 2. タイムラインの読込
           fetch('posts.json')
             .then(res => res.json())
             .then(posts => {
@@ -209,13 +209,15 @@
               timelineContainer.innerHTML = '';
               if (posts.length === 0) return;
 
-              posts.forEach(post => {
+              posts.forEach((post, index) => {
+                // IDがなければ自動で生成する
+                const postId = post.id || 'post-' + index;
                 const card = document.createElement('div');
                 card.className = 'post-card';
                 let imageHtml = post.image ? `<img src="${post.image}" class="post-image">` : '';
                 
                 // このツイートに対するコメントを抽出
-                const postComments = gasData.filter(item => item.postId === post.id);
+                const postComments = gasData.filter(item => item.postId === postId);
                 let commentsHtml = '';
                 postComments.forEach(c => {
                   commentsHtml += `
@@ -236,9 +238,9 @@
                   <div class="comment-section">
                     <div style="font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 4px;">Comments</div>
                     ${commentsHtml}
-                    <form class="comment-form" onsubmit="sendPost(event, '${post.id}', 'name-${post.id}', 'msg-${post.id}')">
-                      <input type="text" id="name-${post.id}" placeholder="名前（省略可）">
-                      <textarea id="msg-${post.id}" rows="1" placeholder="このツイートに返信..." required></textarea>
+                    <form class="comment-form" onsubmit="sendPost(event, '${postId}', 'name-${postId}', 'msg-${postId}')">
+                      <input type="text" id="name-${postId}" placeholder="名前（省略可）">
+                      <textarea id="msg-${postId}" rows="1" placeholder="このツイートに返信..." required></textarea>
                       <button type="submit">REPLY</button>
                     </form>
                   </div>
@@ -259,7 +261,6 @@
       });
     }
 
-    // 共通の送信関数
     function sendPost(e, postId, nameId, msgId) {
       e.preventDefault();
       if (!GAS_URL) return;
