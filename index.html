@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O-ASIS - 仮想ネットワーク</title>
+    <title>O-ASIS - 仮想ネットワーク空間</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -14,8 +14,9 @@
             padding: 0;
         }
         body {
-            background-color: #050814;
-            color: #f1f5f9;
+            /* サマーウォーズのOZをイメージした明るくクリーンな空間 */
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 50%, #fdf4ff 100%);
+            color: #1e293b;
             font-family: 'Zen Kaku Gothic New', sans-serif;
             min-height: 100vh;
             display: flex;
@@ -25,13 +26,13 @@
             position: relative;
             padding: 40px 20px;
         }
-        /* OASIS風のネットワーク背景グラデーション */
+        /* 空間に浮かぶ幾何学的な光の演出 */
         body::before {
             content: '';
             position: fixed;
-            width: 1000px;
-            height: 1000px;
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.07) 0%, rgba(138, 43, 226, 0.04) 40%, rgba(5, 8, 20, 0) 70%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 210, 255, 0.15) 0%, rgba(255, 0, 128, 0.05) 50%, rgba(255, 255, 255, 0) 70%);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -44,139 +45,221 @@
             width: 100%;
             max-width: 640px;
             text-align: center;
-            animation: fadeIn 1.2s ease-out;
+            animation: fadeIn 0.8s ease-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* SAO/OZ風のシステムバッジ */
         .gateway-badge {
             display: inline-block;
             font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
-            letter-spacing: 0.25em;
-            color: #00f0ff;
-            border: 1px solid rgba(0, 240, 255, 0.4);
-            padding: 6px 16px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            background: rgba(0, 240, 255, 0.05);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+            font-size: 11px;
+            letter-spacing: 0.3em;
+            color: #0070f3;
+            border: 2px solid rgba(0, 112, 243, 0.3);
+            padding: 6px 18px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0, 112, 243, 0.1);
         }
         h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: clamp(36px, 7vw, 64px);
+            font-size: clamp(36px, 8vw, 64px);
             font-weight: 700;
-            letter-spacing: 0.1em;
-            color: #ffffff;
-            margin-bottom: 8px;
-            text-shadow: 0 0 25px rgba(0, 240, 255, 0.4), 0 0 50px rgba(138, 43, 226, 0.3);
+            letter-spacing: 0.15em;
+            color: #0f172a;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 10px rgba(0, 112, 243, 0.15);
         }
         .subtitle {
-            font-size: 14px;
-            color: #94a3b8;
+            font-size: 13px;
+            color: #64748b;
             letter-spacing: 0.3em;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
             text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
         }
-        /* ステータスボード */
+        /* ホログラム風ステータスボード */
         .status-board {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(0, 240, 255, 0.3);
+            background: rgba(255, 255, 255, 0.85);
+            border: 2px solid #0070f3;
+            border-radius: 6px;
             padding: 20px;
-            margin-bottom: 40px;
-            border-radius: 8px;
+            margin-bottom: 30px;
             text-align: left;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 30px rgba(0, 112, 243, 0.12);
+            backdrop-filter: blur(8px);
         }
         .status-title {
             font-family: 'Orbitron', sans-serif;
             font-size: 11px;
             letter-spacing: 0.2em;
-            color: #00f0ff;
+            color: #0070f3;
             margin-bottom: 6px;
+            font-weight: 700;
         }
         .status-text {
             font-size: 14px;
-            color: #e2e8f0;
-            letter-spacing: 0.05em;
-            line-height: 1.5;
+            color: #334155;
+            line-height: 1.6;
         }
-        /* タイムライン */
+        /* 壁打ちコーナー（入力エリア） */
+        .wall-section {
+            background: rgba(255, 255, 255, 0.85);
+            border: 2px solid #ec4899;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 35px;
+            text-align: left;
+            box-shadow: 0 8px 30px rgba(236, 72, 153, 0.12);
+            backdrop-filter: blur(8px);
+        }
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            color: #ec4899;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        .wall-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .wall-input, .wall-textarea {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .wall-input:focus, .wall-textarea:focus {
+            border-color: #ec4899;
+            background: #ffffff;
+        }
+        .wall-textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        .wall-submit {
+            background: linear-gradient(135deg, #ec4899, #0070f3);
+            color: #ffffff;
+            border: none;
+            padding: 11px;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .wall-submit:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+        /* タイムライン・ログ共通カード */
         .timeline {
             text-align: left;
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 20px;
         }
-        .post-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: 3px solid #00f0ff;
+        .post-card, .wall-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #0070f3;
+            border-radius: 6px;
             padding: 20px;
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(8px);
         }
-        .post-card:hover {
-            border-color: rgba(0, 240, 255, 0.6);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+        .wall-card {
+            border-left-color: #ec4899;
         }
         .post-header {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 11px;
             color: #64748b;
-            margin-bottom: 12px;
-            letter-spacing: 0.1em;
+            margin-bottom: 10px;
             font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.1em;
         }
         .post-header span:first-child {
-            color: #00f0ff;
+            color: #0070f3;
+            font-weight: 700;
+        }
+        .wall-card .post-header span:first-child {
+            color: #ec4899;
         }
         .post-text {
             font-size: 15px;
-            color: #f1f5f9;
+            color: #1e293b;
             line-height: 1.7;
-            letter-spacing: 0.03em;
             white-space: pre-wrap;
-            margin-bottom: 15px;
         }
         .post-image {
             width: 100%;
             max-height: 400px;
             object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            margin-top: 15px;
         }
         .loading {
             text-align: center;
-            color: #64748b;
-            font-size: 14px;
-            padding: 20px;
+            color: #94a3b8;
+            font-size: 13px;
+            padding: 15px;
+            font-family: 'Orbitron', sans-serif;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="gateway-badge">VIRTUAL NETWORK</div>
+        <div class="gateway-badge">SYSTEM // O-ASIS GATEWAY</div>
         <h1>O-ASIS</h1>
-        <p class="subtitle">Connected Space</p>
+        <p class="subtitle">Virtual Network Space</p>
         
-        <!-- 現在のステータス -->
+        <!-- O-jiのステータス -->
         <div class="status-board">
             <div class="status-title">O-ji's Status</div>
-            <div id="status-content" class="status-text">接続を確立中...</div>
+            <div id="status-content" class="status-text">リンク確立中...</div>
         </div>
 
-        <!-- タイムライン -->
+        <!-- 壁打ちコーナー -->
+        <div class="wall-section">
+            <div class="section-title">Anonymous Wall / 壁打ち回線</div>
+            <form id="wall-form" class="wall-form">
+                <input type="text" id="wall-name" class="wall-input" placeholder="名前 (省略時は Anonymous)" maxlength="20">
+                <textarea id="wall-message" class="wall-textarea" placeholder="ここに思考や言葉を放り投げろ..." required></textarea>
+                <button type="submit" id="wall-submit-btn" class="wall-submit">TRANSMIT</button>
+            </form>
+        </div>
+
+        <!-- 壁打ちログ -->
+        <div id="wall-container" class="timeline" style="margin-bottom: 35px;">
+            <div class="loading">壁打ち回線を受信中...</div>
+        </div>
+
+        <!-- O-jiのタイムライン -->
         <div id="timeline-container" class="timeline">
             <div class="loading">ネットワークデータを同期中...</div>
         </div>
     </div>
 
     <script>
+        const GAS_URL = "ここにGASのウェブアプリURLを貼り付け";
+
         // ステータス読み込み
         fetch('status.txt?' + new Date().getTime())
             .then(res => res.text())
@@ -185,41 +268,100 @@
             })
             .catch(() => { document.getElementById('status-content').innerText = 'シグナルなし。'; });
 
-        // タイムライン読み込み
+        // O-jiのタイムライン読み込み
         fetch('posts.json?' + new Date().getTime())
             .then(res => res.json())
             .then(posts => {
                 const container = document.getElementById('timeline-container');
                 container.innerHTML = '';
-                
-                if (posts.length === 0) {
-                    container.innerHTML = '<div class="loading">データがありません。</div>';
-                    return;
-                }
+                if (posts.length === 0) return;
 
                 posts.forEach(post => {
                     const card = document.createElement('div');
                     card.className = 'post-card';
-                    
-                    let imageHtml = '';
-                    if (post.image && post.image.trim() !== '') {
-                        imageHtml = `<img src="${post.image}" class="post-image" alt="network image">`;
-                    }
-
+                    let imageHtml = post.image ? `<img src="${post.image}" class="post-image">` : '';
                     card.innerHTML = `
-                        <div class="post-header">
-                            <span>O-ji</span>
-                            <span>${post.date}</span>
-                        </div>
+                        <div class="post-header"><span>O-ji</span><span>${post.date}</span></div>
                         <div class="post-text">${post.text}</div>
                         ${imageHtml}
                     `;
                     container.appendChild(card);
                 });
+            }).catch(() => {});
+
+        // 壁打ちログ読み込み
+        function loadWallMessages() {
+            if (!GAS_URL || GAS_URL.includes("ここ")) return;
+            fetch(GAS_URL)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('wall-container');
+                    container.innerHTML = '';
+                    if (data.length === 0) {
+                        container.innerHTML = '<div class="loading">まだ誰も言葉を置いていません。</div>';
+                        return;
+                    }
+                    data.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'wall-card';
+                        card.innerHTML = `
+                            <div class="post-header"><span>${escapeHtml(item.name)}</span><span>${escapeHtml(item.timestamp)}</span></div>
+                            <div class="post-text">${escapeHtml(item.message)}</div>
+                        `;
+                        container.appendChild(card);
+                    });
+                })
+                .catch(() => {
+                    document.getElementById('wall-container').innerHTML = '<div class="loading">壁打ち回線の同期に失敗しました。</div>';
+                });
+        }
+
+        // 送信処理
+        document.getElementById('wall-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!GAS_URL || GAS_URL.includes("ここ")) {
+                alert("GASのURLが設定されていません。");
+                return;
+            }
+
+            const nameBtn = document.getElementById('wall-name');
+            const msgBtn = document.getElementById('wall-message');
+            const submitBtn = document.getElementById('wall-submit-btn');
+
+            const payload = {
+                name: nameBtn.value.trim(),
+                message: msgBtn.value.trim()
+            };
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "TRANSMITTING...";
+
+            fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.status === "success") {
+                    msgBtn.value = '';
+                    loadWallMessages();
+                }
+                submitBtn.disabled = false;
+                submitBtn.innerText = "TRANSMIT";
             })
             .catch(() => {
-                document.getElementById('timeline-container').innerHTML = '<div class="loading">同期に失敗しました。</div>';
+                alert("送信に失敗しました。");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "TRANSMIT";
             });
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        loadWallMessages();
     </script>
 </body>
 </html>
