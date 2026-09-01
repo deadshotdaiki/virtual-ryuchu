@@ -12,7 +12,6 @@
       --glass-bg: rgba(18, 20, 32, 0.45);
       --glass-border: rgba(255, 255, 255, 0.08);
       --glass-border-hover: rgba(168, 85, 247, 0.3);
-      --accent-glow: rgba(139, 92, 246, 0.15);
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
       --primary-gradient: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
@@ -33,7 +32,6 @@
       position: relative;
     }
 
-    /* 幻想的な背景のオーロラ・光のゆらぎ */
     body::before {
       content: '';
       position: fixed;
@@ -77,11 +75,11 @@
       font-weight: 300;
     }
 
-    /* タブメニュー（高級ガラスモーフィズム） */
+    /* タブメニュー（4つ対応） */
     .tab-container {
       display: flex;
       width: 100%;
-      max-width: 480px;
+      max-width: 520px;
       margin-bottom: 24px;
       background: rgba(10, 11, 18, 0.6);
       backdrop-filter: blur(24px);
@@ -94,7 +92,7 @@
 
     .tab-btn {
       flex: 1;
-      padding: 10px;
+      padding: 10px 4px;
       background: transparent;
       border: none;
       color: var(--text-muted);
@@ -102,8 +100,8 @@
       font-weight: 500;
       cursor: pointer;
       text-align: center;
-      font-size: 0.75rem;
-      letter-spacing: 2px;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
       border-radius: 10px;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -121,7 +119,6 @@
       text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
     }
 
-    /* メインカード */
     .card {
       background: var(--glass-bg);
       backdrop-filter: blur(28px);
@@ -130,7 +127,7 @@
       border-radius: 20px;
       padding: 24px;
       width: 100%;
-      max-width: 480px;
+      max-width: 520px;
       margin-bottom: 20px;
       box-sizing: border-box;
       display: none;
@@ -211,8 +208,40 @@
       transform: translateY(-1px);
     }
 
-    button:active {
-      transform: translateY(1px);
+    /* ギャラリー用グリッドレイアウト */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .gallery-item {
+      background: rgba(14, 16, 26, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .gallery-item:hover {
+      border-color: var(--glass-border-hover);
+      box-shadow: 0 8px 24px rgba(168, 85, 247, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .gallery-image {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-info {
+      padding: 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 1px;
     }
 
     .post-card {
@@ -223,11 +252,6 @@
       margin-top: 14px;
       border-radius: 14px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      transition: border-color 0.2s;
-    }
-
-    .post-card:hover {
-      border-color: var(--glass-border-hover);
     }
 
     .comment-card {
@@ -323,10 +347,11 @@
     <div class="subtitle">Virtual Network Space</div>
   </header>
 
-  <!-- タブ切り替えボタン -->
+  <!-- タブメニュー（4つ） -->
   <div class="tab-container">
     <button class="tab-btn active" onclick="switchTab('timeline', event)">TIMELINE</button>
     <button class="tab-btn" onclick="switchTab('status', event)">STATUS</button>
+    <button class="tab-btn" onclick="switchTab('gallery', event)">GALLERY</button>
     <button class="tab-btn" onclick="switchTab('contact', event)">CONTACT</button>
   </div>
 
@@ -344,7 +369,15 @@
     <div id="status-container" style="white-space: pre-wrap; font-size: 0.85rem; font-weight: 300; line-height: 1.6; color: #e5e7eb;">INITIALIZING...</div>
   </div>
 
-  <!-- 3. 連絡先タブ -->
+  <!-- 3. ギャラリータブ -->
+  <div id="tab-gallery" class="card">
+    <div class="section-title">Gallery Archive</div>
+    <div id="gallery-container">
+      <div class="loading">LOADING ASSETS...</div>
+    </div>
+  </div>
+
+  <!-- 4. 連絡先タブ -->
   <div id="tab-contact" class="card">
     <div class="section-title">Contact</div>
     <a href="mailto:deadshotdaiki@gmail.com" class="link-item" onclick="playAudio('click')">
@@ -360,7 +393,6 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbycDeI_m_ERlsdFSTDF7S4Dl1agQnwzfxQgrEw9OciBmlc4wrvX8rRiAAzoUEJtvNLlBw/exec";
 
-    // Web Audio API による高級感のある効果音ジェネレーター
     let audioCtx = null;
     function playAudio(type) {
       try {
@@ -376,16 +408,14 @@
         gain.connect(audioCtx.destination);
 
         if (type === 'tab') {
-          // タブ切り替え用の透き通った高音チャイム
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-          osc.frequency.exponentialRampToValueAtTime(880.00, audioCtx.currentTime + 0.08); // A5
+          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880.00, audioCtx.currentTime + 0.08);
           gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
           osc.start();
           osc.stop(audioCtx.currentTime + 0.08);
         } else if (type === 'click') {
-          // ボタンクリック用の硬質な電子音
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(440, audioCtx.currentTime);
           osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.05);
@@ -394,9 +424,7 @@
           osc.start();
           osc.stop(audioCtx.currentTime + 0.05);
         }
-      } catch (e) {
-        // AudioContextの自動再生制限などのエラー対策
-      }
+      } catch (e) {}
     }
 
     function switchTab(tabName, event) {
@@ -421,7 +449,39 @@
         if (el) el.innerText = text;
       }).catch(() => {});
 
+    // ギャラリーデータの読み込み（gallery.json を読み込み表示）
+    function loadGallery() {
+      fetch('gallery.json')
+        .then(res => res.json())
+        .then(items => {
+          const container = document.getElementById('gallery-container');
+          if (!container) return;
+          container.innerHTML = '';
+          if (!items || items.length === 0) {
+            container.innerHTML = '<div class="loading">NO ASSETS FOUND</div>';
+            return;
+          }
+          const grid = document.createElement('div');
+          grid.className = 'gallery-grid';
+          items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'gallery-item';
+            div.innerHTML = `
+              <img src="${item.image}" class="gallery-image" alt="Artwork">
+              <div class="gallery-info">${item.title || 'Untitled'}</div>
+            `;
+            grid.appendChild(div);
+          });
+          container.appendChild(grid);
+        })
+        .catch(() => {
+          const container = document.getElementById('gallery-container');
+          if (container) container.innerHTML = '<div class="loading">FAILED TO LOAD GALLERY</div>';
+        });
+    }
+
     function loadAllData() {
+      loadGallery();
       if (!GAS_URL) return;
       fetch(GAS_URL)
         .then(res => res.json())
