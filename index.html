@@ -239,6 +239,29 @@
     }
     .post-header { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 1px; }
 
+    /* コメント（リプライ）セクション */
+    .comments-section {
+      margin-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 12px;
+    }
+    .comment-item {
+      background: rgba(4, 5, 8, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 0.75rem;
+    }
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
     .link-item {
       display: block;
       padding: 20px;
@@ -288,16 +311,6 @@
   <!-- 1. タイムライン -->
   <div id="tab-timeline" class="card active">
     <div class="section-title">Timeline</div>
-    
-    <!-- ゲスト向けタイムライン投稿フォーム -->
-    <div style="background: rgba(4, 5, 8, 0.7); border: 1px solid var(--glass-border); padding: 16px; border-radius: 16px; margin-bottom: 24px;">
-      <div style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 1px;">POST TO TIMELINE</div>
-      <input type="text" id="timeline-author" placeholder="お名前（任意）" style="margin-bottom: 8px; font-size: 0.75rem; padding: 10px;">
-      <textarea id="timeline-text" rows="2" placeholder="いま何してる？コメントを入力..." style="margin-bottom: 8px; font-size: 0.75rem; padding: 10px;"></textarea>
-      <input type="text" id="timeline-image" placeholder="画像URL（任意：images/xxx.jpg など）" style="margin-bottom: 8px; font-size: 0.75rem; padding: 10px;">
-      <button onclick="playSound('action'); postTimelineComment()" style="padding: 10px; font-size: 0.65rem;">TRANSMIT POST</button>
-    </div>
-
     <div id="timeline-container"><div class="loading">ESTABLISHING SECURE LINK...</div></div>
   </div>
 
@@ -482,7 +495,8 @@
         .then(res => res.json())
         .then(jsonPosts => {
           const localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-          const allPosts = [...localPosts, ...jsonPosts];
+          // ローカル投稿がなければ初期JSONをベースにする
+          const allPosts = localPosts.length > 0 ? localPosts : jsonPosts;
           renderTimeline(allPosts);
         })
         .catch(() => {
@@ -498,55 +512,102 @@
         return;
       }
       container.innerHTML = '';
-      posts.forEach(post => {
+      posts.forEach((post, index) => {
         const card = document.createElement('div');
         card.className = 'post-card';
+        
         let imageHtml = (post.image && post.image.trim() !== "") 
           ? `<img src="${post.image}" class="gallery-image" style="border-radius:12px; margin-top:12px; cursor:pointer;" onclick="playSound('modal'); openModalWithImage('${post.image}', '${escapeHtml(post.date)}', '${escapeHtml(post.text)}')">` 
           : '';
         
         let authorHtml = post.author ? `<span style="color:#c084fc; margin-right:8px;">${escapeHtml(post.author)}</span>` : '';
-        
+
+        // コメント一覧の生成
+        let commentsHtml = '';
+        if (post.comments && post.comments.length > 0) {
+          post.comments.forEach(comm => {
+            commentsHtml += `
+              <div class="comment-item">
+                <div class="comment-header">
+                  <span><b style="color:#c084fc;">${escapeHtml(comm.author)}</b></span>
+                  <span>${escapeHtml(comm.date)}</span>
+                </div>
+                <div style="word-break:break-all; font-weight:300; line-height:1.4;">${escapeHtml(comm.text)}</div>
+              </div>
+            `;
+          });
+        }
+
         card.innerHTML = `
           <div class="post-header"><span>${authorHtml}${escapeHtml(post.date || '')}</span></div>
           <div style="font-size:0.85rem; font-weight:300; line-height:1.6; word-break:break-all;">${escapeHtml(post.text || '')}</div>
           ${imageHtml}
+          
+          <div class="comments-section">
+            <div style="font-size:0.6rem; color:var(--text-muted); margin-bottom:8px; letter-spacing:1px;">REPLIES</div>
+            <div id="comments-list-${index}">${commentsHtml}</div>
+            
+            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+              <input type="text" id="comment-author-${index}" placeholder="お名前（任意）" style="margin-bottom:0; font-size:0.7rem; padding:8px 12px;">
+              <div style="display: flex; gap: 6px;">
+                <input type="text" id="comment-text-${index}" placeholder="返信を入力..." style="margin-bottom:0; font-size:0.7rem; padding:8px 12px;" onkeypress="if(event.key === 'Enter') addComment(${index})">
+                <button onclick="playSound('action'); addComment(${index})" style="width: auto; padding: 8px 14px; font-size:0.6rem;">REPLY</button>
+              </div>
+            </div>
+          </div>
         `;
         container.appendChild(card);
       });
     }
 
-    // ゲストによるタイムライン投稿機能
-    function postTimelineComment() {
-      const author = document.getElementById('timeline-author').value.trim() || 'ゲスト';
-      const text = document.getElementById('timeline-text').value.trim();
-      const image = document.getElementById('timeline-image').value.trim();
+    // 各投稿へのコメント追加機能
+    function addComment(index) {
+      const authorInput = document.getElementById(`comment-author-${index}`);
+      const textInput = document.getElementById(`comment-text-${index}`);
+      
+      const author = authorInput.value.trim() || 'ゲスト';
+      const text = textInput.value.trim();
 
-      if (!text) {
-        alert('コメント（本文）を入力してください。');
-        return;
-      }
+      if (!text) return;
 
       const now = new Date();
-      const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-      const newPost = {
-        id: 'post-' + Date.now(),
-        author: author,
-        date: dateStr,
-        text: text,
-        image: image
-      };
+      // 現在のポストデータを取得して更新
+      fetch('posts.json')
+        .then(res => res.json())
+        .then(jsonPosts => {
+          let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+          if (localPosts.length === 0) {
+            localPosts = jsonPosts;
+          }
 
-      const localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-      localPosts.unshift(newPost);
-      localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
+          if (!localPosts[index].comments) {
+            localPosts[index].comments = [];
+          }
 
-      document.getElementById('timeline-text').value = '';
-      document.getElementById('timeline-image').value = '';
-      document.getElementById('timeline-author').value = '';
-      loadTimeline();
-      alert('タイムラインに投稿しました！');
+          localPosts[index].comments.push({
+            author: author,
+            date: dateStr,
+            text: text
+          });
+
+          localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
+          renderTimeline(localPosts);
+        })
+        .catch(() => {
+          let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+          if (localPosts[index]) {
+            if (!localPosts[index].comments) localPosts[index].comments = [];
+            localPosts[index].comments.push({
+              author: author,
+              date: dateStr,
+              text: text
+            });
+            localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
+            renderTimeline(localPosts);
+          }
+        });
     }
 
     function openModalWithImage(imgSrc, dateStr, textStr) {
