@@ -121,13 +121,13 @@
   <div id="tab-dm" class="card">
     <div class="section-title">Direct Message</div>
     
+    <!-- ゲスト用：ステータスを見るだけ -->
     <div style="background: rgba(5, 6, 10, 0.4); border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; margin-bottom: 16px;">
       <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 6px;">CURRENT STATUS</div>
-      <div id="current-status-text" style="font-size: 0.85rem; font-weight: 500; color: #c084fc; margin-bottom: 8px;">(通常営業中)</div>
-      <input type="text" id="status-input" placeholder="ステータスを編集（例: 外出中 / 忙しい）" style="margin-bottom: 8px; font-size: 0.75rem; padding: 8px;">
-      <button onclick="updateStatusText()" style="padding: 6px; font-size: 0.7rem;">UPDATE STATUS</button>
+      <div id="current-status-text" style="font-size: 0.85rem; font-weight: 500; color: #c084fc;">(通常営業中)</div>
     </div>
 
+    <!-- ゲスト向け画面 -->
     <div id="dm-guest-section">
       <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6;">
         誕生日とか、4文字の暗証番号を入れると他の人から見られなくなります(ディープな話はdiscordまで)
@@ -161,11 +161,20 @@
       </div>
     </div>
 
+    <!-- 管理者ダッシュボード（ここでステータスを変更できる） -->
     <div id="admin-dashboard" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <span style="font-size: 0.75rem; color: #c084fc;">ADMIN PANEL (ALL DMS)</span>
+        <span style="font-size: 0.75rem; color: #c084fc;">ADMIN PANEL (ALL DMs)</span>
         <button onclick="logoutAdmin()" style="width: auto; padding: 4px 10px; font-size: 0.65rem;">LOGOUT</button>
       </div>
+
+      <!-- 管理者専用のステータス変更エリア -->
+      <div style="background: rgba(5, 6, 10, 0.6); border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; margin-bottom: 16px;">
+        <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 6px;">EDIT STATUS (ADMIN ONLY)</div>
+        <input type="text" id="status-input" placeholder="新しいステータス（例: 外出中 / 忙しい）" style="margin-bottom: 8px; font-size: 0.75rem; padding: 8px;">
+        <button onclick="updateStatusText()" style="padding: 6px; font-size: 0.7rem;">UPDATE STATUS</button>
+      </div>
+
       <div id="admin-messages-list" style="max-height: 400px; overflow-y: auto;"></div>
     </div>
   </div>
@@ -232,7 +241,6 @@
 
     loadStatus();
 
-    // ★ posts.json からタイムラインデータを読み込む仕様に復元
     function loadTimeline() {
       const container = document.getElementById('timeline-container');
       fetch('posts.json')
@@ -265,7 +273,7 @@
 
     function openModalWithImage(imgSrc, dateStr, textStr) {
       document.getElementById('modal-img').src = imgSrc;
-      document.getElementById('modal-title'].innerText = dateStr;
+      document.getElementById('modal-title').innerText = dateStr;
       document.getElementById('modal-desc').innerText = textStr;
       document.getElementById('image-modal').classList.add('show');
     }
