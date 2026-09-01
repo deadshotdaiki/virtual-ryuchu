@@ -37,8 +37,12 @@
       max-width: 500px;
       margin-bottom: 16px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-sizing: border-box;
     }
     .status-box {
+      border-color: #3b82f6;
+    }
+    .timeline-box {
       border-color: #3b82f6;
     }
     .wall-box {
@@ -70,16 +74,21 @@
       cursor: pointer;
       letter-spacing: 1px;
     }
-    .post-card, .wall-card {
+    .post-card {
       background: #fff;
       border-left: 4px solid #3b82f6;
       padding: 12px;
-      margin-top: 10px;
+      margin-top: 12px;
       border-radius: 4px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
     .wall-card {
-      border-left-color: #ec4899;
+      background: #fff;
+      border-left: 4px solid #ec4899;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
     }
     .post-header {
       display: flex;
@@ -96,6 +105,23 @@
       width: 100%;
       border-radius: 4px;
       margin-top: 8px;
+    }
+    .comment-section {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed #e2e8f0;
+    }
+    .comment-form {
+      margin-top: 8px;
+    }
+    .comment-form input, .comment-form textarea {
+      font-size: 0.8rem;
+      padding: 6px;
+      margin-bottom: 4px;
+    }
+    .comment-form button {
+      padding: 6px;
+      font-size: 0.8rem;
     }
     .loading {
       text-align: center;
@@ -116,29 +142,28 @@
     <div id="status-container">リンク確立中...</div>
   </div>
 
-  <!-- 壁打ち回線 -->
+  <!-- タイムライン（最上部に配置） -->
+  <div class="card timeline-box">
+    <div class="section-title" style="color: #3b82f6;">Timeline</div>
+    <div id="timeline-container">
+      <div class="loading">ネットワークデータを同期中...</div>
+    </div>
+  </div>
+
+  <!-- 壁打ち回線（フリーコメント用） -->
   <div class="card wall-box">
     <div class="section-title" style="color: #ec4899;">Anonymous Wall / 壁打ち回線</div>
-    <form id="wall-form">
+    <form id="wall-form" onsubmit="sendPost(event, 'general', 'wall-name', 'wall-message')">
       <input type="text" id="wall-name" placeholder="名前（省略時は Anonymous）">
-      <textarea id="wall-message" rows="3" placeholder="ここに思考や言葉を放り投げろ..." required></textarea>
-      <button type="submit" id="wall-submit-btn">TRANSMIT</button>
+      <textarea id="wall-message" rows="2" placeholder="ここに思考や言葉を放り投げろ..." required></textarea>
+      <button type="submit">TRANSMIT</button>
     </form>
     <div id="wall-container">
       <div class="loading">壁打ち回線を受信中...</div>
     </div>
   </div>
 
-  <!-- タイムライン -->
-  <div class="card">
-    <div class="section-title">Timeline</div>
-    <div id="timeline-container">
-      <div class="loading">ネットワークデータを同期中...</div>
-    </div>
-  </div>
-
   <script>
-    // 最新のGASのURLをセット
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzPuaH0iLiwIAaBrNtWBrp74kEX1j-Gy2V_5-SeoJupOIRSR8Z8UVbDBMJKU-2GJhTWBA/exec";
 
     // ステータス読込
@@ -149,53 +174,82 @@
         if (el) el.innerText = text;
       }).catch(() => {});
 
-    // タイムライン読込
-    fetch('posts.json')
-      .then(res => res.json())
-      .then(posts => {
-        const container = document.getElementById('timeline-container');
-        if (!container) return;
-        container.innerHTML = '';
-        if (posts.length === 0) return;
-        posts.forEach(post => {
-          const card = document.createElement('div');
-          card.className = 'post-card';
-          let imageHtml = post.image ? `<img src="${post.image}" class="post-image">` : '';
-          card.innerHTML = `
-            <div class="post-header"><span>O-ji</span><span>${post.date}</span></div>
-            <div class="post-text">${post.text}</div>
-            ${imageHtml}
-          `;
-          container.appendChild(card);
-        });
-      }).catch(() => {});
-
-    // 壁打ち回線読込
-    function loadWallMessages() {
+    // 総合データ同期関数（タイムラインと壁打ちをまとめて取得）
+    function loadAllData() {
       if (!GAS_URL) return;
       fetch(GAS_URL)
         .then(res => res.json())
-        .then(data => {
-          const container = document.getElementById('wall-container');
-          if (!container) return;
-          container.innerHTML = '';
-          if (data.length === 0) {
-            container.innerHTML = '<div class="loading">まだ誰も言葉を置いていません。</div>';
-            return;
+        .then(gasData => {
+          // 1. 壁打ち回線の描画 (postId === 'general')
+          const wallContainer = document.getElementById('wall-container');
+          if (wallContainer) {
+            wallContainer.innerHTML = '';
+            const generalMsgs = gasData.filter(item => item.postId === 'general' || !item.postId);
+            if (generalMsgs.length === 0) {
+              wallContainer.innerHTML = '<div class="loading">まだ誰も言葉を置いていません。</div>';
+            } else {
+              generalMsgs.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'wall-card';
+                card.innerHTML = `
+                  <div class="post-header"><span>${escapeHtml(item.name || 'Anonymous')}</span><span>${escapeHtml(item.timestamp || '')}</span></div>
+                  <div class="post-text">${escapeHtml(item.message || '')}</div>
+                `;
+                wallContainer.appendChild(card);
+              });
+            }
           }
-          data.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'wall-card';
-            card.innerHTML = `
-              <div class="post-header"><span>${escapeHtml(item.name || 'Anonymous')}</span><span>${escapeHtml(item.timestamp || '')}</span></div>
-              <div class="post-text">${escapeHtml(item.message || '')}</div>
-            `;
-            container.appendChild(card);
-          });
+
+          // 2. タイムラインの読込とコメント紐づけ
+          fetch('posts.json')
+            .then(res => res.json())
+            .then(posts => {
+              const timelineContainer = document.getElementById('timeline-container');
+              if (!timelineContainer) return;
+              timelineContainer.innerHTML = '';
+              if (posts.length === 0) return;
+
+              posts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                let imageHtml = post.image ? `<img src="${post.image}" class="post-image">` : '';
+                
+                // このツイートに対するコメントを抽出
+                const postComments = gasData.filter(item => item.postId === post.id);
+                let commentsHtml = '';
+                postComments.forEach(c => {
+                  commentsHtml += `
+                    <div class="wall-card" style="border-left-color: #3b82f6;">
+                      <div class="post-header"><span>${escapeHtml(c.name || 'Anonymous')}</span><span>${escapeHtml(c.timestamp || '')}</span></div>
+                      <div class="post-text">${escapeHtml(c.message || '')}</div>
+                    </div>
+                  `;
+                });
+                if (postComments.length === 0) {
+                  commentsHtml = '<div style="font-size:0.75rem; color:#64748b; margin-top:4px;">コメントはまだありません</div>';
+                }
+
+                card.innerHTML = `
+                  <div class="post-header"><span>O-ji</span><span>${post.date}</span></div>
+                  <div class="post-text">${post.text}</div>
+                  ${imageHtml}
+                  <div class="comment-section">
+                    <div style="font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 4px;">Comments</div>
+                    ${commentsHtml}
+                    <form class="comment-form" onsubmit="sendPost(event, '${post.id}', 'name-${post.id}', 'msg-${post.id}')">
+                      <input type="text" id="name-${post.id}" placeholder="名前（省略可）">
+                      <textarea id="msg-${post.id}" rows="1" placeholder="このツイートに返信..." required></textarea>
+                      <button type="submit">REPLY</button>
+                    </form>
+                  </div>
+                `;
+                timelineContainer.appendChild(card);
+              });
+            }).catch(() => {});
         })
         .catch(() => {
-          const container = document.getElementById('wall-container');
-          if (container) container.innerHTML = '<div class="loading">壁打ち回線の同期に失敗しました</div>';
+          const wallContainer = document.getElementById('wall-container');
+          if (wallContainer) wallContainer.innerHTML = '<div class="loading">同期に失敗しました</div>';
         });
     }
 
@@ -205,37 +259,32 @@
       });
     }
 
-    loadWallMessages();
+    // 共通の送信関数
+    function sendPost(e, postId, nameId, msgId) {
+      e.preventDefault();
+      if (!GAS_URL) return;
+      const nameInput = document.getElementById(nameId);
+      const msgInput = document.getElementById(msgId);
+      const name = nameInput ? nameInput.value : '';
+      const message = msgInput ? msgInput.value : '';
+      if (!message) return;
 
-    // 送信処理
-    const form = document.getElementById('wall-form');
-    if (form) {
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (!GAS_URL) {
-          alert('GASのURLが設定されていません。');
-          return;
-        }
-        const nameInput = document.getElementById('wall-name');
-        const msgInput = document.getElementById('wall-message');
-        const name = nameInput ? nameInput.value : '';
-        const message = msgInput ? msgInput.value : '';
-        if (!message) return;
-
-        fetch(GAS_URL, {
-          method: 'POST',
-          body: JSON.stringify({ name: name, message: message })
-        })
-        .then(res => res.json())
-        .then(() => {
-          if (msgInput) msgInput.value = '';
-          loadWallMessages();
-        })
-        .catch(() => {
-          alert('送信に失敗しました。');
-        });
+      fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({ name: name, message: message, postId: postId })
+      })
+      .then(res => res.json())
+      .then(() => {
+        if (msgInput) msgInput.value = '';
+        if (nameInput) nameInput.value = '';
+        loadAllData();
+      })
+      .catch(() => {
+        alert('送信に失敗しました。');
       });
     }
+
+    loadAllData();
   </script>
 </body>
 </html>
