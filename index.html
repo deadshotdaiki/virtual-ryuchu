@@ -291,7 +291,7 @@
 
         // 壁打ちログ読み込み
         function loadWallMessages() {
-            if (!GAS_URL || GAS_URL.includes("ここ")) return;
+            if (!GAS_URL || GAS_URL.includes("https://script.google.com/macros/s/AKfycbxnmJd6XYKDCB18SQMfph_SYnYZPvDiMzAYBnvBEFM_Tek27IUM0_iZf901030jz1zySw/exec")) return;
             fetch(GAS_URL)
                 .then(res => res.json())
                 .then(data => {
