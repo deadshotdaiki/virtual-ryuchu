@@ -121,7 +121,6 @@
   <div id="tab-dm" class="card">
     <div class="section-title">Direct Message</div>
     
-    <!-- 管理人のステータス表示・変更エリア -->
     <div style="background: rgba(5, 6, 10, 0.4); border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; margin-bottom: 16px;">
       <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 6px;">CURRENT STATUS</div>
       <div id="current-status-text" style="font-size: 0.85rem; font-weight: 500; color: #c084fc; margin-bottom: 8px;">(通常営業中)</div>
@@ -129,7 +128,6 @@
       <button onclick="updateStatusText()" style="padding: 6px; font-size: 0.7rem;">UPDATE STATUS</button>
     </div>
 
-    <!-- ゲスト用メッセージボックス -->
     <div id="dm-guest-section">
       <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6;">
         誕生日とか、4文字の暗証番号を入れると他の人から見られなくなります(ディープな話はdiscordまで)
@@ -154,7 +152,6 @@
         </form>
       </div>
 
-      <!-- 管理人ログインへの切り出し線 -->
       <div style="margin-top: 24px; border-top: 1px solid var(--glass-border); padding-top: 16px;">
         <details style="font-size: 0.75rem; color: var(--text-muted);">
           <summary style="cursor: pointer; margin-bottom: 8px;">管理者用ログイン</summary>
@@ -164,7 +161,6 @@
       </div>
     </div>
 
-    <!-- 管理者用ダッシュボード -->
     <div id="admin-dashboard" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <span style="font-size: 0.75rem; color: #c084fc;">ADMIN PANEL (ALL DMS)</span>
@@ -236,27 +232,42 @@
 
     loadStatus();
 
-    // ★ タイムラインのデータを直接埋め込み（ファイル読み込みエラーを防ぎます）
-    const timelineData = [
-      { date: "2026.09.01", content: "O-ASIS // バーチャル隆中を開設しました。" }
-    ];
-
+    // ★ posts.json からタイムラインデータを読み込む仕様に復元
     function loadTimeline() {
       const container = document.getElementById('timeline-container');
-      if (!timelineData || timelineData.length === 0) {
-        container.innerHTML = '<div class="loading">NO TIMELINE DATA</div>';
-        return;
-      }
-      container.innerHTML = '';
-      timelineData.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'post-card';
-        card.innerHTML = `
-          <div class="post-header"><span>${escapeHtml(item.date || '')}</span></div>
-          <div style="font-size:0.85rem; font-weight:300; line-height:1.5;">${escapeHtml(item.content || '')}</div>
-        `;
-        container.appendChild(card);
-      });
+      fetch('posts.json')
+        .then(res => res.json())
+        .then(posts => {
+          if (!posts || posts.length === 0) {
+            container.innerHTML = '<div class="loading">NO TIMELINE DATA</div>';
+            return;
+          }
+          container.innerHTML = '';
+          posts.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            let imageHtml = (post.image && post.image.trim() !== "") 
+              ? `<img src="${post.image}" class="gallery-image" style="border-radius:10px; margin-top:10px; cursor:pointer;" onclick="openModalWithImage('${post.image}', '${escapeHtml(post.date)}', '${escapeHtml(post.text)}')">` 
+              : '';
+            
+            card.innerHTML = `
+              <div class="post-header"><span>${escapeHtml(post.date || '')}</span></div>
+              <div style="font-size:0.85rem; font-weight:300; line-height:1.5; word-break:break-all;">${escapeHtml(post.text || '')}</div>
+              ${imageHtml}
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(() => {
+          container.innerHTML = '<div class="loading">NO TIMELINE DATA</div>';
+        });
+    }
+
+    function openModalWithImage(imgSrc, dateStr, textStr) {
+      document.getElementById('modal-img').src = imgSrc;
+      document.getElementById('modal-title'].innerText = dateStr;
+      document.getElementById('modal-desc').innerText = textStr;
+      document.getElementById('image-modal').classList.add('show');
     }
 
     function loadGallery() {
