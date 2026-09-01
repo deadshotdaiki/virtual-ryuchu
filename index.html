@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>O-ASIS // VIRTUAL NETWORK SPACE</title>
+  <title>O-ASIS // バーチャル 隆中</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
 
@@ -35,7 +35,7 @@
       font-size: 1.8rem; letter-spacing: 6px; margin: 0 0 6px 0; font-weight: 500;
       background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    .subtitle { font-size: 0.7rem; letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase; font-weight: 300; }
+    .subtitle { font-size: 0.75rem; letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase; font-weight: 300; }
 
     .tab-container {
       display: flex; width: 100%; max-width: 520px; margin-bottom: 24px;
@@ -100,7 +100,7 @@
 
   <header>
     <h1>O-ASIS</h1>
-    <div class="subtitle">Virtual Network Space</div>
+    <div class="subtitle">バーチャル 隆中</div>
   </header>
 
   <!-- タブメニュー -->
@@ -236,23 +236,26 @@
 
     loadStatus();
 
+    // ★ タイムラインのデータを直接埋め込み（ファイル読み込みエラーを防ぎます）
+    const timelineData = [
+      { date: "2026.09.01", content: "O-ASIS // バーチャル隆中を開設しました。" }
+    ];
+
     function loadTimeline() {
-      fetch('timeline.json').then(res => res.json()).then(items => {
-        const container = document.getElementById('timeline-container');
-        if (!items) return;
-        container.innerHTML = '';
-        items.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'post-card';
-          card.innerHTML = `
-            <div class="post-header"><span>${escapeHtml(item.date || '')}</span></div>
-            <div style="font-size:0.85rem; font-weight:300; line-height:1.5;">${escapeHtml(item.content || '')}</div>
-          `;
-          container.appendChild(card);
-        });
-      }).catch(() => {
-        const container = document.getElementById('timeline-container');
-        if (container) container.innerHTML = '<div class="loading">NO TIMELINE DATA</div>';
+      const container = document.getElementById('timeline-container');
+      if (!timelineData || timelineData.length === 0) {
+        container.innerHTML = '<div class="loading">NO TIMELINE DATA</div>';
+        return;
+      }
+      container.innerHTML = '';
+      timelineData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'post-card';
+        card.innerHTML = `
+          <div class="post-header"><span>${escapeHtml(item.date || '')}</span></div>
+          <div style="font-size:0.85rem; font-weight:300; line-height:1.5;">${escapeHtml(item.content || '')}</div>
+        `;
+        container.appendChild(card);
       });
     }
 
