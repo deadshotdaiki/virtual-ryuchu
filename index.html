@@ -75,7 +75,7 @@
       font-weight: 300;
     }
 
-    /* タブメニュー（4つ対応） */
+    /* タブメニュー */
     .tab-container {
       display: flex;
       width: 100%;
@@ -220,6 +220,7 @@
       border: 1px solid var(--glass-border);
       border-radius: 14px;
       overflow: hidden;
+      cursor: pointer;
       transition: all 0.3s ease;
     }
 
@@ -242,6 +243,80 @@
       color: var(--text-muted);
       text-align: center;
       letter-spacing: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 拡大モーダル画面 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(3, 4, 7, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: rgba(18, 20, 32, 0.85);
+      border: 1px solid var(--glass-border-hover);
+      border-radius: 20px;
+      max-width: 480px;
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+      text-align: center;
+      position: relative;
+      animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-image {
+      width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      margin-bottom: 16px;
+      background: #000;
+    }
+
+    .modal-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .modal-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-weight: 300;
+      word-break: break-all;
     }
 
     .post-card {
@@ -347,7 +422,7 @@
     <div class="subtitle">Virtual Network Space</div>
   </header>
 
-  <!-- タブメニュー（4つ） -->
+  <!-- タブメニュー -->
   <div class="tab-container">
     <button class="tab-btn active" onclick="switchTab('timeline', event)">TIMELINE</button>
     <button class="tab-btn" onclick="switchTab('status', event)">STATUS</button>
@@ -387,6 +462,16 @@
     <div class="link-item" onclick="copyDiscord(); playAudio('click');" style="cursor: pointer;">
       <span>💬 Copy Discord ID</span>
       <span style="font-size:0.75rem; color:var(--text-muted); display:block; font-weight:300; margin-top:4px;">vamos_cantar (Click to Copy)</span>
+    </div>
+  </div>
+
+  <!-- 拡大表示用モーダル -->
+  <div id="image-modal" class="modal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <img id="modal-img" class="modal-image" src="" alt="Zoomed Image">
+      <div id="modal-title" class="modal-title"></div>
+      <div id="modal-desc" class="modal-desc"></div>
+      <button onclick="closeModal()">CLOSE</button>
     </div>
   </div>
 
@@ -449,7 +534,7 @@
         if (el) el.innerText = text;
       }).catch(() => {});
 
-    // ギャラリーデータの読み込み（gallery.json を読み込み表示）
+    // ギャラリーデータ読み込みと拡大モーダル連動
     function loadGallery() {
       fetch('gallery.json')
         .then(res => res.json())
@@ -470,6 +555,11 @@
               <img src="${item.image}" class="gallery-image" alt="Artwork">
               <div class="gallery-info">${item.title || 'Untitled'}</div>
             `;
+            // タップされた時にモーダルを開く処理
+            div.onclick = () => {
+              playAudio('click');
+              openModal(item.image, item.title, item.description);
+            };
             grid.appendChild(div);
           });
           container.appendChild(grid);
@@ -478,6 +568,24 @@
           const container = document.getElementById('gallery-container');
           if (container) container.innerHTML = '<div class="loading">FAILED TO LOAD GALLERY</div>';
         });
+    }
+
+    function openModal(imageSrc, title, description) {
+      const modal = document.getElementById('image-modal');
+      const modalImg = document.getElementById('modal-img');
+      const modalTitle = document.getElementById('modal-title');
+      const modalDesc = document.getElementById('modal-desc');
+
+      modalImg.src = imageSrc;
+      modalTitle.innerText = title || 'Untitled';
+      modalDesc.innerText = description || 'No description provided.';
+      modal.classList.add('show');
+    }
+
+    function closeModal() {
+      playAudio('click');
+      const modal = document.getElementById('image-modal');
+      modal.classList.remove('show');
     }
 
     function loadAllData() {
