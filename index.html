@@ -87,7 +87,6 @@
 
     .post-card { background: rgba(14, 16, 26, 0.5); border: 1px solid var(--glass-border); border-left: 2px solid #c084fc; padding: 16px; margin-top: 14px; border-radius: 14px; }
     .post-header { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; }
-    .post-text { font-size: 0.9rem; word-break: break-all; color: #e5e7eb; line-height: 1.6; font-weight: 300; }
 
     .link-item { display: block; padding: 16px; margin-bottom: 10px; background: rgba(14, 16, 26, 0.5); border: 1px solid var(--glass-border); border-radius: 14px; color: var(--text-main); text-decoration: none; font-size: 0.85rem; }
 
@@ -104,6 +103,7 @@
     <div class="subtitle">Virtual Network Space</div>
   </header>
 
+  <!-- タブメニュー -->
   <div class="tab-container">
     <button class="tab-btn active" onclick="switchTab('timeline', event)">TIMELINE</button>
     <button class="tab-btn" onclick="switchTab('status', event)">STATUS</button>
@@ -112,24 +112,29 @@
     <button class="tab-btn" onclick="switchTab('contact', event)">CONTACT</button>
   </div>
 
+  <!-- 1. タイムライン -->
   <div id="tab-timeline" class="card active">
     <div class="section-title">Timeline</div>
     <div id="timeline-container"><div class="loading">ESTABLISHING LINK...</div></div>
   </div>
 
+  <!-- 2. ステータス -->
   <div id="tab-status" class="card">
     <div class="section-title">O-ji's Status</div>
     <div id="status-container" style="white-space: pre-wrap; font-size: 0.85rem; font-weight: 300; line-height: 1.6; color: #e5e7eb;">INITIALIZING...</div>
   </div>
 
+  <!-- 3. ギャラリー -->
   <div id="tab-gallery" class="card">
     <div class="section-title">Gallery Archive</div>
     <div id="gallery-container"><div class="loading">LOADING ASSETS...</div></div>
   </div>
 
+  <!-- 4. DMタブ -->
   <div id="tab-dm" class="card">
     <div class="section-title">Direct Message</div>
     
+    <!-- 管理人のステータス表示・変更エリア -->
     <div style="background: rgba(5, 6, 10, 0.4); border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; margin-bottom: 16px;">
       <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 6px;">CURRENT STATUS</div>
       <div id="current-status-text" style="font-size: 0.85rem; font-weight: 500; color: #c084fc; margin-bottom: 8px;">(通常営業中)</div>
@@ -137,6 +142,7 @@
       <button onclick="updateStatusText()" style="padding: 6px; font-size: 0.7rem;">UPDATE STATUS</button>
     </div>
 
+    <!-- ゲスト用メッセージボックス -->
     <div id="dm-guest-section">
       <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6;">
         DM（名前と内容を入れて送ると僕から返信がきます、誕生日を入れると他の人には見られないプライベートチャットになります）
@@ -161,6 +167,7 @@
         </form>
       </div>
 
+      <!-- 管理人ログインへの切り出し線 -->
       <div style="margin-top: 24px; border-top: 1px solid var(--glass-border); padding-top: 16px;">
         <details style="font-size: 0.75rem; color: var(--text-muted);">
           <summary style="cursor: pointer; margin-bottom: 8px;">管理者用ログイン</summary>
@@ -170,6 +177,7 @@
       </div>
     </div>
 
+    <!-- 管理者用ダッシュボード -->
     <div id="admin-dashboard" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <span style="font-size: 0.75rem; color: #c084fc;">ADMIN PANEL (ALL DMS)</span>
@@ -179,6 +187,7 @@
     </div>
   </div>
 
+  <!-- 5. 連絡先 -->
   <div id="tab-contact" class="card">
     <div class="section-title">Contact</div>
     <a href="mailto:deadshotdaiki@gmail.com" class="link-item">
@@ -191,6 +200,7 @@
     </div>
   </div>
 
+  <!-- 拡大モーダル -->
   <div id="image-modal" class="modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <img id="modal-img" class="modal-image" src="">
@@ -201,7 +211,7 @@
   </div>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbycDeI_m_ERlsdFSTDF7S4Dl1agQnwzfxQgrEw9OciBmlc4wrvX8rRiAAzoUEJtvNLlBw/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyL7hDxmO3DJdg0XWCCtQBlZSMPT4SKNx3xlCDnOhJ60uSa2wExSzOkRSyrYMBrPvMAxw/exec";
 
     let currentBirthday = "";
     let currentName = "";
@@ -217,7 +227,6 @@
       navigator.clipboard.writeText('vamos_cantar').then(() => alert('Discord ID をコピーしました。'));
     }
 
-    // ステータスのロード・保存（localStorage利用）
     function loadStatus() {
       const savedStatus = localStorage.getItem('o_asis_status') || '(通常営業中)';
       document.getElementById('current-status-text').innerText = savedStatus;
@@ -236,10 +245,26 @@
 
     loadStatus();
 
-    fetch('status.txt').then(res => res.text()).then(text => {
-      const saved = localStorage.getItem('o_asis_status');
-      if (!saved) document.getElementById('status-container').innerText = text;
-    }).catch(() => {});
+    // タイムライン読み込み
+    function loadTimeline() {
+      fetch('timeline.json').then(res => res.json()).then(items => {
+        const container = document.getElementById('timeline-container');
+        if (!items) return;
+        container.innerHTML = '';
+        items.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'post-card';
+          card.innerHTML = `
+            <div class="post-header"><span>${escapeHtml(item.date || '')}</span></div>
+            <div style="font-size:0.85rem; font-weight:300; line-height:1.5;">${escapeHtml(item.content || '')}</div>
+          `;
+          container.appendChild(card);
+        });
+      }).catch(() => {
+        const container = document.getElementById('timeline-container');
+        if (container) container.innerHTML = '<div class="loading">NO TIMELINE DATA</div>';
+      });
+    }
 
     function loadGallery() {
       fetch('gallery.json').then(res => res.json()).then(items => {
@@ -268,7 +293,6 @@
       document.getElementById('image-modal').classList.remove('show');
     }
 
-    // ゲストDM機能
     function sendAndOpenDm() {
       const name = document.getElementById('dm-name').value.trim();
       const birthday = document.getElementById('dm-birthday').value.trim();
@@ -353,7 +377,6 @@
       .catch(() => alert('送信に失敗しました。'));
     }
 
-    // 管理人機能（パスキー: 20040808）
     function loginAsAdmin() {
       const passkey = document.getElementById('admin-passkey').value.trim();
       if (passkey !== "20040808") {
@@ -383,7 +406,6 @@
             return;
           }
 
-          // 誕生日キーごとにグループ化
           const groups = {};
           data.forEach(item => {
             if (!groups[item.birthday]) groups[item.birthday] = [];
@@ -412,7 +434,7 @@
             });
 
             card.innerHTML = `
-              <div class="post-header"><span>KEY: ${bday} (${guestName})</span><span>${thread.length}件のメッセージ</span></div>
+              <div class="post-header"><span>KEY: ${bday} (${guestName})</span><span>${thread.length}件</span></div>
               <div style="margin-bottom:10px;">${messagesHtml}</div>
               <div style="display:flex; gap:6px;">
                 <input type="text" id="admin-reply-${bday}" placeholder="管理人として返信..." style="margin-bottom:0; font-size:0.75rem; padding:8px;">
@@ -436,7 +458,7 @@
       .then(res => res.json())
       .then(() => {
         input.value = '';
-        loginAsAdmin(); // 再読込
+        loginAsAdmin();
       })
       .catch(() => alert('返信に失敗しました。'));
     }
@@ -445,6 +467,8 @@
       return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
     }
 
+    // 初期実行
+    loadTimeline();
     loadGallery();
   </script>
 </body>
