@@ -25,7 +25,35 @@
       font-size: 0.8rem;
       letter-spacing: 1px;
       color: #64748b;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
+    }
+    /* タブメニュー */
+    .tab-container {
+      display: flex;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 16px;
+      gap: 8px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 8px;
+      font-weight: bold;
+      color: #64748b;
+      cursor: pointer;
+      text-align: center;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #ec4899 100%);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     .card {
       background: rgba(255, 255, 255, 0.8);
@@ -38,17 +66,16 @@
       margin-bottom: 16px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       box-sizing: border-box;
+      display: none;
     }
-    .status-box {
-      border-color: #3b82f6;
-    }
-    .timeline-box {
-      border-color: #3b82f6;
+    .card.active {
+      display: block;
     }
     .section-title {
       font-size: 0.9rem;
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      color: #3b82f6;
     }
     input, textarea {
       width: 100%;
@@ -120,6 +147,22 @@
       padding: 6px;
       font-size: 0.8rem;
     }
+    .link-item {
+      display: block;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      color: #1a1a2e;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .link-item:hover {
+      background: #f1f5f9;
+    }
     .loading {
       text-align: center;
       color: #64748b;
@@ -133,20 +176,55 @@
   <h1>O-ASIS</h1>
   <div class="subtitle">VIRTUAL NETWORK SPACE</div>
 
-  <div class="card status-box">
-    <div class="section-title" style="color: #3b82f6;">O-ji's Status</div>
-    <div id="status-container">リンク確立中...</div>
+  <!-- タブ切り替えボタン -->
+  <div class="tab-container">
+    <div class="tab-btn active" onclick="switchTab('timeline', event)">Timeline</div>
+    <div class="tab-btn" onclick="switchTab('status', event)">Status</div>
+    <div class="tab-btn" onclick="switchTab('contact', event)">Contact</div>
   </div>
 
-  <div class="card timeline-box">
-    <div class="section-title" style="color: #3b82f6;">Timeline</div>
+  <!-- 1. タイムラインタブ -->
+  <div id="tab-timeline" class="card active">
+    <div class="section-title">Timeline</div>
     <div id="timeline-container">
       <div class="loading">ネットワークデータを同期中...</div>
     </div>
   </div>
 
+  <!-- 2. ステータスタブ -->
+  <div id="tab-status" class="card">
+    <div class="section-title">O-ji's Status</div>
+    <div id="status-container">リンク確立中...</div>
+  </div>
+
+  <!-- 3. 連絡先タブ -->
+  <div id="tab-contact" class="card">
+    <div class="section-title">Contact</div>
+    <a href="mailto:deadshotdaiki@gmail.com" class="link-item">
+      ✉️ メールを送る <span style="font-size:0.75rem; color:#64748b; display:block; font-weight:normal;">deadshotdaiki@gmail.com</span>
+    </a>
+    <div class="link-item" onclick="copyDiscord()" style="cursor: pointer;">
+      💬 Discord ID <span style="font-size:0.75rem; color:#64748b; display:block; font-weight:normal;">vamos_cantar (タップしてコピー)</span>
+    </div>
+  </div>
+
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbycDeI_m_ERlsdFSTDF7S4Dl1agQnwzfxQgrEw9OciBmlc4wrvX8rRiAAzoUEJtvNLlBw/exec";
+
+    function switchTab(tabName, event) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById('tab-' + tabName).classList.add('active');
+    }
+
+    // Discordコピー機能
+    function copyDiscord() {
+      navigator.clipboard.writeText('vamos_cantar').then(() => {
+        alert('Discord ID (vamos_cantar) をコピーしました！');
+      });
+    }
 
     // ステータス読込
     fetch('status.txt')
@@ -156,7 +234,7 @@
         if (el) el.innerText = text;
       }).catch(() => {});
 
-    // データ同期
+    // タイムラインデータ同期
     function loadAllData() {
       if (!GAS_URL) return;
       fetch(GAS_URL)
@@ -176,7 +254,6 @@
                 card.className = 'post-card';
                 let imageHtml = post.image ? `<img src="${post.image}" class="post-image">` : '';
                 
-                // このツイートに対するコメントを抽出
                 const postComments = gasData.filter(item => item.postId === postId);
                 let commentsHtml = '';
                 postComments.forEach(c => {
