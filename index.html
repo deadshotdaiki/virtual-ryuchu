@@ -106,9 +106,8 @@
   <!-- タブメニュー -->
   <div class="tab-container">
     <button class="tab-btn active" onclick="switchTab('timeline', event)">TIMELINE</button>
-    <button class="tab-btn" onclick="switchTab('status', event)">STATUS</button>
-    <button class="tab-btn" onclick="switchTab('gallery', event)">GALLERY</button>
     <button class="tab-btn" onclick="switchTab('dm', event)">DM</button>
+    <button class="tab-btn" onclick="switchTab('gallery', event)">GALLERY</button>
     <button class="tab-btn" onclick="switchTab('contact', event)">CONTACT</button>
   </div>
 
@@ -118,19 +117,7 @@
     <div id="timeline-container"><div class="loading">ESTABLISHING LINK...</div></div>
   </div>
 
-  <!-- 2. ステータス -->
-  <div id="tab-status" class="card">
-    <div class="section-title">O-ji's Status</div>
-    <div id="status-container" style="white-space: pre-wrap; font-size: 0.85rem; font-weight: 300; line-height: 1.6; color: #e5e7eb;">INITIALIZING...</div>
-  </div>
-
-  <!-- 3. ギャラリー -->
-  <div id="tab-gallery" class="card">
-    <div class="section-title">Gallery Archive</div>
-    <div id="gallery-container"><div class="loading">LOADING ASSETS...</div></div>
-  </div>
-
-  <!-- 4. DMタブ -->
+  <!-- 2. DMタブ -->
   <div id="tab-dm" class="card">
     <div class="section-title">Direct Message</div>
     
@@ -145,12 +132,12 @@
     <!-- ゲスト用メッセージボックス -->
     <div id="dm-guest-section">
       <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6;">
-        DM（名前と内容を入れて送ると僕から返信がきます、誕生日を入れると他の人には見られないプライベートチャットになります）
+        誕生日とか、4文字の暗証番号を入れると他の人から見られなくなります(ディープな話はdiscordまで)
       </p>
 
       <div id="dm-login-box">
         <input type="text" id="dm-name" placeholder="お名前">
-        <input type="text" id="dm-birthday" placeholder="誕生日（例: 1206 ※合言葉になります）">
+        <input type="text" id="dm-birthday" placeholder="誕生日や暗証番号（例: 1206 ※合言葉になります）">
         <textarea id="dm-message" rows="3" placeholder="メッセージ..."></textarea>
         <button onclick="sendAndOpenDm()">SEND MESSAGE</button>
       </div>
@@ -171,7 +158,7 @@
       <div style="margin-top: 24px; border-top: 1px solid var(--glass-border); padding-top: 16px;">
         <details style="font-size: 0.75rem; color: var(--text-muted);">
           <summary style="cursor: pointer; margin-bottom: 8px;">管理者用ログイン</summary>
-          <input type="password" id="admin-passkey" placeholder="パスキーを入力 (20040808)" style="font-size: 0.75rem; padding: 8px; margin-bottom: 8px;">
+          <input type="password" id="admin-passkey" placeholder="パスキーを入力" style="font-size: 0.75rem; padding: 8px; margin-bottom: 8px;">
           <button onclick="loginAsAdmin()" style="padding: 8px; font-size: 0.7rem;">LOGIN AS ADMIN</button>
         </details>
       </div>
@@ -187,7 +174,13 @@
     </div>
   </div>
 
-  <!-- 5. 連絡先 -->
+  <!-- 3. ギャラリー -->
+  <div id="tab-gallery" class="card">
+    <div class="section-title">Gallery Archive</div>
+    <div id="gallery-container"><div class="loading">LOADING ASSETS...</div></div>
+  </div>
+
+  <!-- 4. 連絡先 -->
   <div id="tab-contact" class="card">
     <div class="section-title">Contact</div>
     <a href="mailto:deadshotdaiki@gmail.com" class="link-item">
@@ -230,8 +223,6 @@
     function loadStatus() {
       const savedStatus = localStorage.getItem('o_asis_status') || '(通常営業中)';
       document.getElementById('current-status-text').innerText = savedStatus;
-      const statusContainer = document.getElementById('status-container');
-      if (statusContainer) statusContainer.innerText = `現在のステータス:\n${savedStatus}`;
     }
 
     function updateStatusText() {
@@ -245,7 +236,6 @@
 
     loadStatus();
 
-    // タイムライン読み込み
     function loadTimeline() {
       fetch('timeline.json').then(res => res.json()).then(items => {
         const container = document.getElementById('timeline-container');
@@ -299,7 +289,7 @@
       const message = document.getElementById('dm-message').value.trim();
 
       if (!name || !birthday || !message) {
-        alert('お名前、誕生日、メッセージをすべて入力してください。');
+        alert('お名前、暗証番号、メッセージをすべて入力してください。');
         return;
       }
 
@@ -467,7 +457,6 @@
       return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
     }
 
-    // 初期実行
     loadTimeline();
     loadGallery();
   </script>
