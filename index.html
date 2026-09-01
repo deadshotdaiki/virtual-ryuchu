@@ -25,7 +25,6 @@
             overflow-x: hidden;
             position: relative;
         }
-        /* 背景の微かな光の演出 */
         body::before {
             content: '';
             position: absolute;
@@ -75,45 +74,52 @@
             font-size: clamp(16px, 2.5vw, 20px);
             color: #94a3b8;
             letter-spacing: 0.2em;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
             font-weight: 300;
         }
-        .philosophy-box {
+        .status-board {
             background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 20px 30px;
+            margin: 0 auto 40px auto;
+            max-width: 600px;
+            border-radius: 4px;
+            text-align: left;
+        }
+        .status-title {
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            color: #d4af37;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .status-text {
+            font-size: 15px;
+            color: #cbd5e1;
+            letter-spacing: 0.1em;
+            line-height: 1.6;
+        }
+        .philosophy-box {
+            background: rgba(255, 255, 255, 0.01);
             border-left: 2px solid #d4af37;
-            border-right: 2px solid rgba(212, 175, 55, 0.1);
-            padding: 30px;
-            margin: 0 auto 50px auto;
+            padding: 20px 30px;
+            margin: 0 auto 40px auto;
             max-width: 600px;
             text-align: left;
-            border-radius: 4px;
         }
         .philosophy-box p {
-            font-size: 16px;
-            line-height: 2;
-            color: #cbd5e1;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #94a3b8;
             letter-spacing: 0.1em;
         }
         .philosophy-box .citation {
             display: block;
-            margin-top: 15px;
+            margin-top: 10px;
             text-align: right;
-            font-size: 14px;
+            font-size: 13px;
             color: #d4af37;
             letter-spacing: 0.15em;
-        }
-        .status-panel {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            font-size: 14px;
-            color: #64748b;
-            letter-spacing: 0.1em;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 30px;
-        }
-        .status-item span {
-            color: #38bdf8;
         }
     </style>
 </head>
@@ -123,16 +129,30 @@
         <h1>バーチャル隆中</h1>
         <p class="subtitle">静寂と創造の隠れ里</p>
         
+        <!-- 現在のステータス表示エリア -->
+        <div class="status-board">
+            <div class="status-title">Current Status / 主の近況</div>
+            <div id="status-content" class="status-text">静寂を読み込み中...</div>
+        </div>
+
         <div class="philosophy-box">
             <p>「非淡泊無以明志、非寧静無以致遠」<br>淡泊にあらずんば以て志を明らかにせず、寧静にあらずんば以て遠を致さず。</p>
             <span class="citation">—— 諸葛亮 『誡子書』</span>
         </div>
-
-        <div class="status-panel">
-            <div class="status-item">状態: <span>常時研鑽中</span></div>
-            <div class="status-item">領域: <span>結界展開済</span></div>
-        </div>
     </div>
+
+    <script>
+        // status.txtを自動で読み込んで表示する仕組み
+        fetch('status.txt?' + new Date().getTime())
+            .then(response => response.text())
+            .then(text => {
+                if (text.trim()) {
+                    document.getElementById('status-content').innerText = text.trim();
+                }
+            })
+            .catch(() => {
+                document.getElementById('status-content').innerText = '気配なし。';
+            });
+    </script>
 </body>
 </html>
-```eof
