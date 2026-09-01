@@ -29,6 +29,7 @@
       display: flex;
       justify-content: center;
       padding: 20px 12px;
+      position: relative;
     }
 
     .container {
@@ -281,6 +282,33 @@
       border-top: 1px solid var(--border-color);
     }
 
+    /* フローティングプラスボタン (ツイート作成用) */
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 56px;
+      height: 56px;
+      background: var(--accent-color);
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(192, 132, 252, 0.4);
+      z-index: 999;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .fab-btn:hover {
+      transform: scale(1.08);
+      background: var(--accent-hover);
+    }
+
     /* モーダル */
     .modal {
       display: none;
@@ -354,11 +382,6 @@
 
       <!-- TIMELINE (初期表示) -->
       <div id="tab-timeline" class="card active">
-        <div style="margin-bottom:20px; background:rgba(4,5,8,0.5); padding:12px; border-radius:10px; border:1px solid var(--border-color);">
-          <textarea id="new-post-text" placeholder="いまどうしてる？" rows="3"></textarea>
-          <input type="text" id="new-post-image" placeholder="画像URL (任意)">
-          <button onclick="addNewPost()">投稿する</button>
-        </div>
         <div id="timeline-container"></div>
       </div>
 
@@ -389,7 +412,21 @@
     </div>
   </div>
 
-  <!-- 画像モーダル -->
+  <!-- ツイート投稿用フローティングボタン -->
+  <button id="fab-post-btn" class="fab-btn hidden" onclick="openPostModal()">＋</button>
+
+  <!-- ツイート投稿モーダル -->
+  <div id="post-modal" class="modal" onclick="closePostModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closePostModal()">✕</button>
+      <h3 style="font-size: 1rem; color: var(--accent-color); margin-bottom: 12px;">新規ツイート</h3>
+      <textarea id="new-post-text" placeholder="いまどうしてる？" rows="4"></textarea>
+      <input type="text" id="new-post-image" placeholder="画像URL (任意)">
+      <button onclick="addNewPost()">投稿する</button>
+    </div>
+  </div>
+
+  <!-- 画像閲覧モーダル -->
   <div id="image-modal" class="modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <button class="modal-close" onclick="closeModal()">✕</button>
@@ -453,6 +490,7 @@
       const userDisplay = document.getElementById('user-display');
       const adminBadge = document.getElementById('admin-badge');
       const userDisplayArea = document.getElementById('user-display-area');
+      const fabBtn = document.getElementById('fab-post-btn');
 
       if (sessionData) {
         try {
@@ -460,6 +498,7 @@
           userDisplay.textContent = escapeHtml(currentUser.name);
           adminBadge.textContent = currentUser.isAdmin ? '[ADMIN]' : '[USER]';
           userDisplayArea.classList.remove('hidden');
+          fabBtn.classList.remove('hidden');
 
           authSection.style.display = 'none';
           mainSection.classList.remove('hidden');
@@ -474,6 +513,7 @@
         authSection.style.display = 'block';
         mainSection.classList.add('hidden');
         userDisplayArea.classList.add('hidden');
+        fabBtn.classList.add('hidden');
       }
     }
 
@@ -525,6 +565,16 @@
       }
     }
 
+    // --- ツイート投稿モーダル操作 ---
+    function openPostModal() {
+      playSound('modal');
+      document.getElementById('post-modal').classList.add('show');
+    }
+
+    function closePostModal() {
+      document.getElementById('post-modal').classList.remove('show');
+    }
+
     // --- タイムライン機能 & 削除機能 ---
     function loadTimeline() {
       fetch('posts.json')
@@ -570,6 +620,7 @@
           localPosts.unshift(newPost);
           localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
           textInput.value = ''; imageInput.value = '';
+          closePostModal();
           renderTimeline(localPosts);
         })
         .catch(() => {
@@ -577,6 +628,7 @@
           localPosts.unshift(newPost);
           localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
           textInput.value = ''; imageInput.value = '';
+          closePostModal();
           renderTimeline(localPosts);
         });
     }
@@ -616,7 +668,6 @@
         
         let authorHtml = post.author ? `<span style="color:var(--accent-color); margin-right:8px; font-weight:bold;">${escapeHtml(post.author)}</span>` : '';
 
-        // 投稿の削除ボタン判定（自分または管理者）
         const canDeletePost = currentUser && (currentUser.isAdmin || currentUser.name === post.author);
         const deletePostBtn = canDeletePost ? `<button class="btn-delete" onclick="deletePost(${pIdx})">削除</button>` : '';
 
@@ -724,11 +775,12 @@
       document.getElementById('image-modal').classList.remove('show');
     }
 
-    // --- LINE風 1対1トーク機能 ---
+    // --- LINE風 1対1トーク機能 (修正版: CORS・POST対策) ---
     function initTalkTab() {
       const adminSelector = document.getElementById('admin-talk-selector');
       if (currentUser && currentUser.isAdmin) {
         adminSelector.style.display = 'block';
+        fetchAdminUserList();
       } else {
         adminSelector.style.display = 'none';
       }
@@ -741,7 +793,6 @@
 
       if (currentUser.isAdmin && !targetUser) {
         container.innerHTML = '<div class="loading">上のセレクトボックスからトーク相手を選択してください。</div>';
-        fetchAdminUserList();
         return;
       }
 
@@ -770,10 +821,6 @@
         .catch(() => {
           container.innerHTML = '<div class="loading">通信に失敗しました。</div>';
         });
-
-      if (currentUser.isAdmin) {
-        fetchAdminUserList();
-      }
     }
 
     function fetchAdminUserList() {
@@ -818,17 +865,24 @@
         sender: currentUser.isAdmin ? 'admin' : 'user'
       };
 
+      // CORS対策として mode: 'no-cors' を避け、リダイレクト対応のため text/plain で送信
       fetch(DM_GAS_URL, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
         body: JSON.stringify(payload)
       })
-      .then(res => res.json())
       .then(() => {
         input.value = '';
         playSound('action');
-        fetchTalkMessages();
+        // 少し遅延させてGASの書き込み完了後に再取得
+        setTimeout(fetchTalkMessages, 600);
       })
-      .catch(() => alert('送信に失敗しました。'));
+      .catch((err) => {
+        console.error(err);
+        alert('送信に失敗しました。');
+      });
     }
 
     document.addEventListener('DOMContentLoaded', initSession);
