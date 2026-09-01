@@ -45,9 +45,6 @@
     .timeline-box {
       border-color: #3b82f6;
     }
-    .wall-box {
-      border-color: #ec4899;
-    }
     .section-title {
       font-size: 0.9rem;
       font-weight: bold;
@@ -82,11 +79,11 @@
       border-radius: 4px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
-    .wall-card {
-      background: #fff;
+    .comment-card {
+      background: #f8fafc;
       border-left: 4px solid #ec4899;
-      padding: 10px;
-      margin-top: 8px;
+      padding: 8px 10px;
+      margin-top: 6px;
       border-radius: 4px;
       font-size: 0.9rem;
     }
@@ -107,7 +104,7 @@
       margin-top: 8px;
     }
     .comment-section {
-      margin-top: 10px;
+      margin-top: 12px;
       padding-top: 8px;
       border-top: 1px dashed #e2e8f0;
     }
@@ -136,30 +133,15 @@
   <h1>O-ASIS</h1>
   <div class="subtitle">VIRTUAL NETWORK SPACE</div>
 
-  <!-- ステータス表示 -->
   <div class="card status-box">
     <div class="section-title" style="color: #3b82f6;">O-ji's Status</div>
     <div id="status-container">リンク確立中...</div>
   </div>
 
-  <!-- タイムライン -->
   <div class="card timeline-box">
     <div class="section-title" style="color: #3b82f6;">Timeline</div>
     <div id="timeline-container">
       <div class="loading">ネットワークデータを同期中...</div>
-    </div>
-  </div>
-
-  <!-- 壁打ち回線 -->
-  <div class="card wall-box">
-    <div class="section-title" style="color: #ec4899;">Anonymous Wall / 壁打ち回線</div>
-    <form id="wall-form" onsubmit="sendPost(event, 'general', 'wall-name', 'wall-message')">
-      <input type="text" id="wall-name" placeholder="名前（省略時は Anonymous）">
-      <textarea id="wall-message" rows="2" placeholder="ここに思考や言葉を放り投げろ..." required></textarea>
-      <button type="submit">TRANSMIT</button>
-    </form>
-    <div id="wall-container">
-      <div class="loading">壁打ち回線を受信中...</div>
     </div>
   </div>
 
@@ -180,27 +162,6 @@
       fetch(GAS_URL)
         .then(res => res.json())
         .then(gasData => {
-          // 1. 壁打ち回線の描画
-          const wallContainer = document.getElementById('wall-container');
-          if (wallContainer) {
-            wallContainer.innerHTML = '';
-            const generalMsgs = gasData.filter(item => item.postId === 'general' || !item.postId);
-            if (generalMsgs.length === 0) {
-              wallContainer.innerHTML = '<div class="loading">まだ誰も言葉を置いていません。</div>';
-            } else {
-              generalMsgs.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'wall-card';
-                card.innerHTML = `
-                  <div class="post-header"><span>${escapeHtml(item.name || 'Anonymous')}</span><span>${escapeHtml(item.timestamp || '')}</span></div>
-                  <div class="post-text">${escapeHtml(item.message || '')}</div>
-                `;
-                wallContainer.appendChild(card);
-              });
-            }
-          }
-
-          // 2. タイムラインの読込
           fetch('posts.json')
             .then(res => res.json())
             .then(posts => {
@@ -220,7 +181,7 @@
                 let commentsHtml = '';
                 postComments.forEach(c => {
                   commentsHtml += `
-                    <div class="wall-card" style="border-left-color: #3b82f6;">
+                    <div class="comment-card">
                       <div class="post-header"><span>${escapeHtml(c.name || 'Anonymous')}</span><span>${escapeHtml(c.timestamp || '')}</span></div>
                       <div class="post-text">${escapeHtml(c.message || '')}</div>
                     </div>
@@ -246,11 +207,14 @@
                 `;
                 timelineContainer.appendChild(card);
               });
-            }).catch(() => {});
+            }).catch(() => {
+              const timelineContainer = document.getElementById('timeline-container');
+              if (timelineContainer) timelineContainer.innerHTML = '<div class="loading">ツイートデータの読み込みに失敗しました</div>';
+            });
         })
         .catch(() => {
-          const wallContainer = document.getElementById('wall-container');
-          if (wallContainer) wallContainer.innerHTML = '<div class="loading">同期に失敗しました</div>';
+          const timelineContainer = document.getElementById('timeline-container');
+          if (timelineContainer) timelineContainer.innerHTML = '<div class="loading">コメントデータの同期に失敗しました</div>';
         });
     }
 
