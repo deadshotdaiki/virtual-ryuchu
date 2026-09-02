@@ -34,7 +34,6 @@
     .card { display: none; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); }
     .card.active { display: block; }
     
-    /* タイムライン・リプライ */
     .post-card { background: rgba(4, 5, 8, 0.4); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
     .post-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; }
     .btn-delete { background: transparent; color: #ef4444; border: none; font-size: 0.7rem; cursor: pointer; width: auto; padding: 0; }
@@ -42,13 +41,11 @@
     .comment-item { background: rgba(255, 255, 255, 0.03); padding: 8px; border-radius: 6px; margin-bottom: 6px; font-size: 0.8rem; }
     .comment-header { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px; }
 
-    /* ギャラリー */
     .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
     .gallery-item { background: rgba(4, 5, 8, 0.5); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; cursor: pointer; }
     .gallery-image { width: 100%; height: 120px; object-fit: cover; display: block; }
     .gallery-info { padding: 6px; font-size: 0.7rem; text-align: center; color: var(--text-muted); }
 
-    /* トークUI */
     .chat-container { display: flex; flex-direction: column; height: 420px; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
     .chat-bubble { max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 0.85rem; line-height: 1.4; word-break: break-all; }
@@ -77,7 +74,6 @@
       </div>
     </header>
 
-    <!-- 認証画面 -->
     <div id="auth-section" class="auth-card">
       <h2 style="font-size:1.1rem; margin-bottom:14px; text-align:center;">LOGIN</h2>
       <input type="text" id="auth-name" placeholder="ユーザー名">
@@ -85,7 +81,6 @@
       <button onclick="handleLogin()">ログイン</button>
     </div>
 
-    <!-- メインコンテンツ -->
     <div id="main-section" class="hidden">
       <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('timeline', event)">TIMELINE</button>
@@ -93,17 +88,14 @@
         <button class="tab-btn" onclick="switchTab('talk', event)">TALK</button>
       </div>
 
-      <!-- TIMELINE -->
       <div id="tab-timeline" class="card active">
         <div id="timeline-container"></div>
       </div>
 
-      <!-- GALLERY -->
       <div id="tab-gallery" class="card">
         <div id="gallery-container"></div>
       </div>
 
-      <!-- TALK -->
       <div id="tab-talk" class="card">
         <div id="admin-talk-selector" style="display:none; margin-bottom:10px;">
           <select id="user-chat-select" onchange="changeAdminChatTarget()" style="width:100%; padding:8px; background:rgba(4,5,8,0.8); color:var(--text-main); border:1px solid var(--border-color); border-radius:8px; outline:none; font-size:0.85rem;">
@@ -146,8 +138,7 @@
   </div>
 
   <script>
-    // 更新されたGASのウェブアプリURL
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbykiJL0gOsNqe0baiEvH_hy7YxnfVgX8FQ5Ak0ADexBw3-cnbPyCXke3a5X4dzMRPav2w/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxp37Qn2szv0J5S0Sc0n7YNVvBC4ShngrmelMSb9f_xWHHu3N4Pec2eSbicCdtQ8pkLrg/exec";
 
     let currentUser = null;
     let activeAdminChatUser = "";
@@ -170,6 +161,7 @@
 
       fetch(GAS_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'login', name: name, pass: pass })
       })
       .then(res => res.json())
@@ -238,7 +230,6 @@
     }
     function closeModal() { document.getElementById('image-modal').classList.remove('show'); }
 
-    /* --- タイムライン & リプライ機能 --- */
     function loadTimeline() {
       const localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
       renderTimeline(localPosts);
@@ -318,7 +309,6 @@
       });
     }
 
-    /* --- ギャラリー機能 --- */
     function loadGallery() {
       const container = document.getElementById('gallery-container');
       const galleryItems = [
@@ -338,7 +328,6 @@
       container.innerHTML = gridHtml;
     }
 
-    /* --- トーク機能 (1対1) --- */
     function initTalkTab() {
       const adminSelector = document.getElementById('admin-talk-selector');
       if (currentUser && currentUser.isAdmin) {
