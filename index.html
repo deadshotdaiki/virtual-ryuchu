@@ -282,7 +282,7 @@
       border-top: 1px solid var(--border-color);
     }
 
-    /* フローティングプラスボタン (ツイート作成用) */
+    /* フローティングプラスボタン */
     .fab-btn {
       position: fixed;
       bottom: 30px;
@@ -380,7 +380,7 @@
         <button class="tab-btn" onclick="switchTab('talk', event)">TALK</button>
       </div>
 
-      <!-- TIMELINE (初期表示) -->
+      <!-- TIMELINE -->
       <div id="tab-timeline" class="card active">
         <div id="timeline-container"></div>
       </div>
@@ -390,7 +390,7 @@
         <div id="gallery-container"></div>
       </div>
 
-      <!-- TALK (LINE風 1対1トーク) -->
+      <!-- TALK -->
       <div id="tab-talk" class="card">
         <!-- 管理者用トーク選択メニュー -->
         <div id="admin-talk-selector" style="display:none; margin-bottom:10px;">
@@ -404,7 +404,7 @@
             <div class="loading">メッセージを読み込んでいます...</div>
           </div>
           <form class="chat-input-area" onsubmit="sendChatMessage(event)">
-            <input type="text" id="chat-reply-input" placeholder="メッセージを入力..." style="margin-bottom:0;">
+            <input type="text" id="chat-reply-input" placeholder="メッセージを入力..." style="margin-bottom:0;" autocomplete="off">
             <button type="submit" style="width:auto; padding:0 18px;">送信</button>
           </form>
         </div>
@@ -412,10 +412,8 @@
     </div>
   </div>
 
-  <!-- ツイート投稿用フローティングボタン -->
   <button id="fab-post-btn" class="fab-btn hidden" onclick="openPostModal()">＋</button>
 
-  <!-- ツイート投稿モーダル -->
   <div id="post-modal" class="modal" onclick="closePostModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <button class="modal-close" onclick="closePostModal()">✕</button>
@@ -426,7 +424,6 @@
     </div>
   </div>
 
-  <!-- 画像閲覧モーダル -->
   <div id="image-modal" class="modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <button class="modal-close" onclick="closeModal()">✕</button>
@@ -451,81 +448,6 @@
       }[m]));
     }
 
-    // --- 認証 & ログイン状態維持 ---
-    function handleLogin() {
-      const nameInput = document.getElementById('auth-name');
-      const passInput = document.getElementById('auth-pass');
-      const name = nameInput.value.trim();
-      const pass = passInput.value.trim();
-
-      if (!name || !pass) {
-        alert('ユーザー名とパスワードを入力してください。');
-        return;
-      }
-
-      fetch(AUTH_GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'login', name: name, pass: pass })
-      })
-      .then(res => res.json())
-      .then(resData => {
-        if (resData.status === 'success') {
-          currentUser = { name: name, isAdmin: resData.isAdmin };
-          localStorage.setItem('o_asis_session', JSON.stringify(currentUser));
-          initSession();
-        } else {
-          alert('認証に失敗しました。');
-        }
-      })
-      .catch(err => {
-        console.error('通信エラー:', err);
-        alert('サーバーとの通信に失敗しました。');
-      });
-    }
-
-    function initSession() {
-      const sessionData = localStorage.getItem('o_asis_session');
-      const authSection = document.getElementById('auth-section');
-      const mainSection = document.getElementById('main-section');
-      const userDisplay = document.getElementById('user-display');
-      const adminBadge = document.getElementById('admin-badge');
-      const userDisplayArea = document.getElementById('user-display-area');
-      const fabBtn = document.getElementById('fab-post-btn');
-
-      if (sessionData) {
-        try {
-          currentUser = JSON.parse(sessionData);
-          userDisplay.textContent = escapeHtml(currentUser.name);
-          adminBadge.textContent = currentUser.isAdmin ? '[ADMIN]' : '[USER]';
-          userDisplayArea.classList.remove('hidden');
-          fabBtn.classList.remove('hidden');
-
-          authSection.style.display = 'none';
-          mainSection.classList.remove('hidden');
-
-          loadTimeline();
-          loadGallery();
-          initTalkTab();
-        } catch(e) {
-          logout();
-        }
-      } else {
-        authSection.style.display = 'block';
-        mainSection.classList.add('hidden');
-        userDisplayArea.classList.add('hidden');
-        fabBtn.classList.add('hidden');
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem('o_asis_session');
-      currentUser = null;
-      document.getElementById('auth-name').value = '';
-      document.getElementById('auth-pass').value = '';
-      initSession();
-    }
-
-    // --- 効果音 ---
     function playSound(type) {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -552,7 +474,69 @@
       } catch (e) {}
     }
 
-    // --- タブ切り替え ---
+    function handleLogin() {
+      const nameInput = document.getElementById('auth-name');
+      const passInput = document.getElementById('auth-pass');
+      const name = nameInput.value.trim();
+      const pass = passInput.value.trim();
+
+      if (!name || !pass) {
+        alert('ユーザー名とパスワードを入力してください。');
+        return;
+      }
+
+      fetch(AUTH_GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'login', name: name, pass: pass })
+      })
+      .then(res => res.json())
+      .then(resData => {
+        if (resData.status === 'success') {
+          currentUser = { name: name, isAdmin: resData.isAdmin };
+          localStorage.setItem('o_asis_session', JSON.stringify(currentUser));
+          initSession();
+        } else {
+          alert('認証に失敗しました。');
+        }
+      })
+      .catch(() => alert('サーバーとの通信に失敗しました。'));
+    }
+
+    function initSession() {
+      const sessionData = localStorage.getItem('o_asis_session');
+      if (sessionData) {
+        try {
+          currentUser = JSON.parse(sessionData);
+          document.getElementById('user-display').textContent = escapeHtml(currentUser.name);
+          document.getElementById('admin-badge').textContent = currentUser.isAdmin ? '[ADMIN]' : '[USER]';
+          document.getElementById('user-display-area').classList.remove('hidden');
+          document.getElementById('fab-post-btn').classList.remove('hidden');
+
+          document.getElementById('auth-section').style.display = 'none';
+          document.getElementById('main-section').classList.remove('hidden');
+
+          loadTimeline();
+          loadGallery();
+          initTalkTab();
+        } catch(e) {
+          logout();
+        }
+      } else {
+        document.getElementById('auth-section').style.display = 'block';
+        document.getElementById('main-section').classList.add('hidden');
+        document.getElementById('user-display-area').classList.add('hidden');
+        document.getElementById('fab-post-btn').classList.add('hidden');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('o_asis_session');
+      currentUser = null;
+      document.getElementById('auth-name').value = '';
+      document.getElementById('auth-pass').value = '';
+      initSession();
+    }
+
     function switchTab(tabName, event) {
       playSound('tab');
       document.querySelectorAll('#main-section .tab-btn').forEach(b => b.classList.remove('active'));
@@ -565,204 +549,11 @@
       }
     }
 
-    // --- ツイート投稿モーダル操作 ---
     function openPostModal() {
       playSound('modal');
       document.getElementById('post-modal').classList.add('show');
     }
-
-    function closePostModal() {
-      document.getElementById('post-modal').classList.remove('show');
-    }
-
-    // --- タイムライン機能 & 削除機能 ---
-    function loadTimeline() {
-      fetch('posts.json')
-        .then(res => res.json())
-        .then(jsonPosts => {
-          const localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-          const allPosts = localPosts.length > 0 ? localPosts : jsonPosts;
-          renderTimeline(allPosts);
-        })
-        .catch(() => {
-          const localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-          renderTimeline(localPosts);
-        });
-    }
-
-    function addNewPost() {
-      const textInput = document.getElementById('new-post-text');
-      const imageInput = document.getElementById('new-post-image');
-      const text = textInput.value.trim();
-
-      if (!text) {
-        alert('本文を入力してください。');
-        return;
-      }
-
-      const now = new Date();
-      const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}.${String(now.getHours()).padStart(2,'0')}.${String(now.getMinutes()).padStart(2,'0')}`;
-
-      const newPost = {
-        id: 'post-' + Date.now(),
-        author: currentUser ? currentUser.name : 'ゲスト',
-        date: dateStr,
-        text: text,
-        image: imageInput.value.trim(),
-        comments: []
-      };
-
-      fetch('posts.json')
-        .then(res => res.json())
-        .then(jsonPosts => {
-          let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-          if (localPosts.length === 0) localPosts = jsonPosts;
-          localPosts.unshift(newPost);
-          localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
-          textInput.value = ''; imageInput.value = '';
-          closePostModal();
-          renderTimeline(localPosts);
-        })
-        .catch(() => {
-          let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-          localPosts.unshift(newPost);
-          localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
-          textInput.value = ''; imageInput.value = '';
-          closePostModal();
-          renderTimeline(localPosts);
-        });
-    }
-
-    function deletePost(postIndex) {
-      if (!confirm('この投稿を削除しますか？')) return;
-      let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-      localPosts.splice(postIndex, 1);
-      localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
-      renderTimeline(localPosts);
-    }
-
-    function deleteComment(postIndex, commentIndex) {
-      if (!confirm('この返信を削除しますか？')) return;
-      let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-      if (localPosts[postIndex] && localPosts[postIndex].comments) {
-        localPosts[postIndex].comments.splice(commentIndex, 1);
-        localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
-        renderTimeline(localPosts);
-      }
-    }
-
-    function renderTimeline(posts) {
-      const container = document.getElementById('timeline-container');
-      if (!posts || posts.length === 0) {
-        container.innerHTML = '<div class="loading">NO TIMELINE DATA</div>';
-        return;
-      }
-      container.innerHTML = '';
-      posts.forEach((post, pIdx) => {
-        const card = document.createElement('div');
-        card.className = 'post-card';
-        
-        let imageHtml = (post.image && post.image.trim() !== "") 
-          ? `<img src="${post.image}" class="gallery-image" style="border-radius:12px; margin-top:12px; cursor:pointer;" onclick="openModalWithImage('${post.image}', '${escapeHtml(post.date)}', '${escapeHtml(post.text)}')">` 
-          : '';
-        
-        let authorHtml = post.author ? `<span style="color:var(--accent-color); margin-right:8px; font-weight:bold;">${escapeHtml(post.author)}</span>` : '';
-
-        const canDeletePost = currentUser && (currentUser.isAdmin || currentUser.name === post.author);
-        const deletePostBtn = canDeletePost ? `<button class="btn-delete" onclick="deletePost(${pIdx})">削除</button>` : '';
-
-        let commentsHtml = '';
-        if (post.comments && post.comments.length > 0) {
-          post.comments.forEach((comm, cIdx) => {
-            const canDeleteComm = currentUser && (currentUser.isAdmin || currentUser.name === comm.author);
-            const deleteCommBtn = canDeleteComm ? `<button class="btn-delete" onclick="deleteComment(${pIdx}, ${cIdx})">削除</button>` : '';
-
-            commentsHtml += `
-              <div class="comment-item">
-                <div class="comment-header">
-                  <span><b style="color:var(--accent-color);">${escapeHtml(comm.author)}</b></span>
-                  <div>
-                    <span style="margin-right:6px;">${escapeHtml(comm.date)}</span>
-                    ${deleteCommBtn}
-                  </div>
-                </div>
-                <div style="word-break:break-all; font-weight:300; line-height:1.4;">${escapeHtml(comm.text)}</div>
-              </div>
-            `;
-          });
-        }
-
-        card.innerHTML = `
-          <div class="post-header">
-            <span>${authorHtml}${escapeHtml(post.date || '')}</span>
-            ${deletePostBtn}
-          </div>
-          <div style="font-size:0.85rem; font-weight:300; line-height:1.6; word-break:break-all;">${escapeHtml(post.text || '')}</div>
-          ${imageHtml}
-          
-          <div class="comments-section">
-            <div style="font-size:0.6rem; color:var(--text-muted); margin-bottom:8px; letter-spacing:1px;">REPLIES</div>
-            <div id="comments-list-${pIdx}">${commentsHtml}</div>
-            
-            <div style="margin-top: 10px; display: flex; gap: 6px;">
-              <input type="text" id="comment-text-${pIdx}" placeholder="返信を入力..." style="margin-bottom:0; font-size:0.75rem; padding:8px 12px;" onkeypress="if(event.key === 'Enter') addComment(${pIdx})">
-              <button onclick="playSound('action'); addComment(${pIdx})" style="width: auto; padding: 8px 14px; font-size:0.65rem;">REPLY</button>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function addComment(pIdx) {
-      const textInput = document.getElementById(`comment-text-${pIdx}`);
-      const text = textInput.value.trim();
-      if (!text) return;
-
-      const author = currentUser ? currentUser.name : 'ゲスト';
-      const now = new Date();
-      const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-
-      fetch('posts.json')
-        .then(res => res.json())
-        .then(jsonPosts => {
-          let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-          if (localPosts.length === 0) localPosts = jsonPosts;
-          if (!localPosts[pIdx].comments) localPosts[pIdx].comments = [];
-          localPosts[pIdx].comments.push({ author: author, date: dateStr, text: text });
-          localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
-          renderTimeline(localPosts);
-        })
-        .catch(() => {
-          let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
-          if (localPosts[pIdx]) {
-            if (!localPosts[pIdx].comments) localPosts[pIdx].comments = [];
-            localPosts[pIdx].comments.push({ author: author, date: dateStr, text: text });
-            localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
-            renderTimeline(localPosts);
-          }
-        });
-    }
-
-    // --- ギャラリー ---
-    function loadGallery() {
-      fetch('gallery.json').then(res => res.json()).then(items => {
-        const container = document.getElementById('gallery-container');
-        if (!items) return;
-        container.innerHTML = '';
-        const grid = document.createElement('div');
-        grid.className = 'gallery-grid';
-        items.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'gallery-item';
-          div.innerHTML = `<img src="${item.image}" class="gallery-image"><div class="gallery-info">${item.title || ''}</div>`;
-          div.onclick = () => { openModalWithImage(item.image, item.title || '', item.description || ''); };
-          grid.appendChild(div);
-        });
-        container.appendChild(grid);
-      }).catch(() => {});
-    }
-
+    function closePostModal() { document.getElementById('post-modal').classList.remove('show'); }
     function openModalWithImage(imgSrc, dateStr, textStr) {
       playSound('modal');
       document.getElementById('modal-img').src = imgSrc;
@@ -770,39 +561,118 @@
       document.getElementById('modal-desc').innerText = textStr;
       document.getElementById('image-modal').classList.add('show');
     }
+    function closeModal() { document.getElementById('image-modal').classList.remove('show'); }
 
-    function closeModal() {
-      document.getElementById('image-modal').classList.remove('show');
+    /* --- タイムライン機能 --- */
+    function loadTimeline() {
+      const localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+      renderTimeline(localPosts);
+    }
+    
+    function addNewPost() {
+      const text = document.getElementById('new-post-text').value.trim();
+      const image = document.getElementById('new-post-image').value.trim();
+      if (!text) { alert('本文を入力してください。'); return; }
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const newPost = { author: currentUser.name, date: dateStr, text: text, image: image, comments: [] };
+
+      let localPosts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+      localPosts.unshift(newPost);
+      localStorage.setItem('o_asis_local_posts', JSON.stringify(localPosts));
+      document.getElementById('new-post-text').value = ''; document.getElementById('new-post-image').value = '';
+      closePostModal();
+      renderTimeline(localPosts);
     }
 
-    // --- LINE風 1対1トーク機能 (修正版: CORS・POST対策) ---
+    function deletePost(idx) {
+      if (!confirm('削除しますか？')) return;
+      let posts = JSON.parse(localStorage.getItem('o_asis_local_posts') || '[]');
+      posts.splice(idx, 1);
+      localStorage.setItem('o_asis_local_posts', JSON.stringify(posts));
+      renderTimeline(posts);
+    }
+
+    function renderTimeline(posts) {
+      const container = document.getElementById('timeline-container');
+      if (posts.length === 0) { container.innerHTML = '<div class="loading">投稿がありません</div>'; return; }
+      container.innerHTML = '';
+      posts.forEach((post, i) => {
+        const card = document.createElement('div');
+        card.className = 'post-card';
+        const imgHtml = post.image ? `<img src="${post.image}" class="gallery-image" style="border-radius:12px; margin-top:12px;" onclick="openModalWithImage('${post.image}','','')">` : '';
+        const delBtn = (currentUser && (currentUser.isAdmin || currentUser.name === post.author)) ? `<button class="btn-delete" onclick="deletePost(${i})">削除</button>` : '';
+        
+        card.innerHTML = `
+          <div class="post-header"><span><b style="color:var(--accent-color);">${escapeHtml(post.author)}</b> ${escapeHtml(post.date)}</span>${delBtn}</div>
+          <div style="font-size:0.85rem; line-height:1.6; word-break:break-all;">${escapeHtml(post.text)}</div>
+          ${imgHtml}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* --- ギャラリー機能 --- */
+    function loadGallery() {
+      document.getElementById('gallery-container').innerHTML = '<div class="loading">ギャラリー画像がありません</div>';
+    }
+
+    /* --- トーク (LINE風 1対1) --- */
     function initTalkTab() {
       const adminSelector = document.getElementById('admin-talk-selector');
       if (currentUser && currentUser.isAdmin) {
         adminSelector.style.display = 'block';
         fetchAdminUserList();
       } else {
+        // ゲストの場合は強制的に自分と管理者の1対1ルームに固定
         adminSelector.style.display = 'none';
+        activeAdminChatUser = currentUser.name; 
+        fetchTalkMessages();
       }
+    }
+
+    function fetchAdminUserList() {
+      fetch(`${DM_GAS_URL}?action=getUserList`)
+        .then(res => res.json())
+        .then(resData => {
+          const select = document.getElementById('user-chat-select');
+          const users = resData.users || [];
+          select.innerHTML = '<option value="">トーク相手のゲストを選択...</option>';
+          users.forEach(u => {
+            if (u === 'admin') return; // 管理者自身は除外
+            const opt = document.createElement('option');
+            opt.value = u; opt.textContent = u;
+            if (u === activeAdminChatUser) opt.selected = true;
+            select.appendChild(opt);
+          });
+        }).catch(e => console.error(e));
+    }
+
+    function changeAdminChatTarget() {
+      activeAdminChatUser = document.getElementById('user-chat-select').value;
+      fetchTalkMessages();
     }
 
     function fetchTalkMessages() {
       if (!currentUser) return;
-      const targetUser = currentUser.isAdmin ? activeAdminChatUser : currentUser.name;
       const container = document.getElementById('chat-messages');
+      const targetUser = currentUser.isAdmin ? activeAdminChatUser : currentUser.name;
 
       if (currentUser.isAdmin && !targetUser) {
-        container.innerHTML = '<div class="loading">上のセレクトボックスからトーク相手を選択してください。</div>';
+        container.innerHTML = '<div class="loading">上のリストから話したいゲストを選択してくれ。</div>';
         return;
       }
 
+      container.innerHTML = '<div class="loading">読み込み中...</div>';
+      
       fetch(`${DM_GAS_URL}?user=${encodeURIComponent(targetUser)}`)
         .then(res => res.json())
         .then(resData => {
           const data = resData.data || [];
           container.innerHTML = '';
           if (data.length === 0) {
-            container.innerHTML = '<div class="loading">メッセージ履歴がありません。</div>';
+            container.innerHTML = '<div class="loading">まだメッセージがないようだ。</div>';
             return;
           }
 
@@ -818,32 +688,7 @@
           });
           container.scrollTop = container.scrollHeight;
         })
-        .catch(() => {
-          container.innerHTML = '<div class="loading">通信に失敗しました。</div>';
-        });
-    }
-
-    function fetchAdminUserList() {
-      fetch(`${DM_GAS_URL}?action=getUserList`)
-        .then(res => res.json())
-        .then(resData => {
-          const select = document.getElementById('user-chat-select');
-          const users = resData.users || [];
-          select.innerHTML = '<option value="">トーク相手を選択...</option>';
-          users.forEach(u => {
-            const opt = document.createElement('option');
-            opt.value = u;
-            opt.textContent = u;
-            if (u === activeAdminChatUser) opt.selected = true;
-            select.appendChild(opt);
-          });
-        })
-        .catch(() => {});
-    }
-
-    function changeAdminChatTarget() {
-      activeAdminChatUser = document.getElementById('user-chat-select').value;
-      fetchTalkMessages();
+        .catch(() => { container.innerHTML = '<div class="loading">通信エラーだ。後でもう一度試してくれ。</div>'; });
     }
 
     function sendChatMessage(e) {
@@ -854,7 +699,7 @@
 
       const targetUser = currentUser.isAdmin ? activeAdminChatUser : currentUser.name;
       if (currentUser.isAdmin && !targetUser) {
-        alert('トーク相手を選択してください。');
+        alert('先にトーク相手を選択しろ！');
         return;
       }
 
@@ -865,27 +710,31 @@
         sender: currentUser.isAdmin ? 'admin' : 'user'
       };
 
-      // CORS対策として mode: 'no-cors' を避け、リダイレクト対応のため text/plain で送信
+      input.value = '';
+      
+      // 仮のメッセージを即時表示して体感速度を上げる
+      const container = document.getElementById('chat-messages');
+      const tempBubble = document.createElement('div');
+      tempBubble.className = 'chat-bubble mine';
+      tempBubble.style.opacity = '0.5';
+      tempBubble.innerHTML = `<div>${escapeHtml(message)}</div><div class="chat-time">送信中...</div>`;
+      container.appendChild(tempBubble);
+      container.scrollTop = container.scrollHeight;
+
       fetch(DM_GAS_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       })
       .then(() => {
-        input.value = '';
         playSound('action');
-        // 少し遅延させてGASの書き込み完了後に再取得
-        setTimeout(fetchTalkMessages, 600);
+        setTimeout(fetchTalkMessages, 800);
       })
-      .catch((err) => {
-        console.error(err);
-        alert('送信に失敗しました。');
+      .catch(() => {
+        alert('送信に失敗した。通信環境を確認してくれ。');
+        tempBubble.remove();
       });
     }
-
-    document.addEventListener('DOMContentLoaded', initSession);
   </script>
 </body>
 </html>
